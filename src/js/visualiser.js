@@ -49,8 +49,9 @@ visualiserElement.addEventListener('drop', (e)=>{
         const text = e.target.result
         data = csvToArray(text)
         scrubber.max = data.length - 1
-        playButtonHandler()
+        window.currentData = data[0]
         scrubberCounter = 0
+        playButtonHandler()
       }
     }
   }
@@ -63,9 +64,11 @@ function playButtonHandler() {
   if (playing) {
     playButton.src = playIcon
     playing = false
-  } if (data != null) {
+    console.log('playIcon')
+  } else if (data != null) {
     playButton.src = pausedIcon
     playing = true
+    console.log('pausedIcon')
   }
 }
 playButton.addEventListener('click', playButtonHandler)
@@ -83,7 +86,6 @@ setInterval(()=>{
     else scrubberCounter = 0
   }
 }, 1000/50)
-
 
 
 
