@@ -1,5 +1,6 @@
 import './style.css'
 import setupMotionVisualiser from './visualiser/visualiser.js'
+import sampleData from './sampleData.js'
 
 document.querySelector('#app').innerHTML = `
   <div style='position: absolute; width: 100%; z-index: 10; bottom: 0.5rem; text-align: center'>
@@ -8,4 +9,4 @@ document.querySelector('#app').innerHTML = `
   <div id="visualiserContainer"\>
 `
 
-setupMotionVisualiser(document.querySelector('#visualiserContainer'))
+setupMotionVisualiser(document.querySelector('#visualiserContainer'), sampleData)

@@ -87,6 +87,9 @@ function valuePlayer() {
   else scrubberCounter = 0
 }
 
+if (data != null) {
+  scrubber.max = data.length-1
+}
 
 
 
