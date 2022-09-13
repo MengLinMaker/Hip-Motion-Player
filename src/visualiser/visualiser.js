@@ -5,12 +5,12 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 import relativePosition from './relativePosition'
 import csvToArray from './csvToArray'
 
-import hipSTL from '../asset/hip.stl?url'
-import rightThighSTL from '../asset/rightThigh.stl?url'
-import leftThighSTL from '../asset/leftThigh.stl?url'
+import hipSTL from './asset/hip.stl?url'
+import rightThighSTL from './asset/rightThigh.stl?url'
+import leftThighSTL from './asset/leftThigh.stl?url'
 
-import playIcon from '../asset/icons8-play-96.png?url'
-import pausedIcon from '../asset/icons8-pause-96.png?url'
+import playIcon from './asset/icons8-play-96.png?url'
+import pausedIcon from './asset/icons8-pause-96.png?url'
 
 
 

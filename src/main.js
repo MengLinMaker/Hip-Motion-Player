@@ -1,5 +1,5 @@
 import './style.css'
-import setupMotionVisualiser from './js/visualiser.js'
+import setupMotionVisualiser from './visualiser/visualiser.js'
 
 document.querySelector('#app').innerHTML = `
   <div style='position: absolute; width: 100%; z-index: 10; bottom: 0.5rem; text-align: center'>
