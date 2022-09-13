@@ -50,8 +50,9 @@ visualiserElement.addEventListener('drop', (e)=>{
         data = csvToArray(text)
         scrubber.max = data.length - 1
         window.currentData = data[0]
+        scrubber.value = 0
         scrubberCounter = 0
-        playButtonHandler()
+        if (playing == false) playButtonHandler()
       }
     }
   }
@@ -239,7 +240,7 @@ function animate() {
   resizeCanvas()
   requestAnimationFrame(animate)
   delta += clock.getDelta()
-  if (delta  > interval) {
+  if (delta > interval) {
 
     if (hip != null && rightThigh != null && leftThigh != null){
       if (window.currentData != null) animateData()
@@ -269,17 +270,21 @@ function animateData(){
   hip.rotation.setFromQuaternion(qh)
   qh = new THREE.Quaternion(data[7], data[8], data[9], -data[6]).normalize()
 
-  vector.z = vector.z - 9.81
-  const pos = position.update([vector.x, vector.y, vector.z])
-  hip.position.x = pos[0]
-  hip.position.y = pos[1]
-  hip.position.z = pos[2] 
+  if (playing == true) {
+    vector.z = vector.z - 9.81
+    const pos = position.update([vector.x, vector.y, vector.z])
+    hip.position.x = pos[0]
+    hip.position.y = pos[1]
+    hip.position.z = pos[2] 
+  }
 
+  /*/
   const cosTh = data[6]**2 - data[9]**2
   const sinTh = 2 * data[6] * data[9]
   //let rotation = 360/Math.PI * Math.atan2(data[9],data[6])
   let rotation = 180/Math.PI * Math.atan2(sinTh,cosTh)
   rotation = (rotation+360) % 360
+  //*/
 
   q = new THREE.Quaternion(data[17], data[18], data[19], data[16]).normalize()
   qr = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
