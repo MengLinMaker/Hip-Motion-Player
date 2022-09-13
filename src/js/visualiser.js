@@ -14,9 +14,9 @@ import pausedIcon from '../asset/icons8-pause-96.png?url'
 
 
 
-export default function setupMotionVisualiser(visualiserContainer) {
-let data = null
+export default function setupMotionVisualiser(visualiserContainer, data=null, dataRate=50) {
 let scrubberCounter = 0
+let myValuePlayer = null
 
 visualiserContainer.innerHTML=`
   <div style='position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;'>
@@ -64,30 +64,33 @@ function playButtonHandler() {
   if (playing) {
     playButton.src = playIcon
     playing = false
-    console.log('playIcon')
+    clearInterval(myValuePlayer)
   } else if (data != null) {
     playButton.src = pausedIcon
     playing = true
-    console.log('pausedIcon')
+    myValuePlayer = setInterval(valuePlayer, 1000/dataRate)
   }
 }
 playButton.addEventListener('click', playButtonHandler)
 
 scrubber.addEventListener('input', (e)=>{
-  scrubberCounter = scrubber.value
-  console.log(scrubberCounter)
+  parseFloat(scrubber.value)
+  scrubberCounter = parseFloat(scrubber.value)
+  window.currentData = data[scrubberCounter]
 })
 
-setInterval(()=>{
-  if (data != null && playing == true) {
-    window.currentData = data[scrubberCounter]
-    scrubber.value = scrubberCounter
-    if (scrubberCounter <= scrubber.max) scrubberCounter += 1
-    else scrubberCounter = 0
-  }
-}, 1000/50)
+function valuePlayer() {
+  window.currentData = data[scrubberCounter]
+  scrubber.value = scrubberCounter
+  if (scrubberCounter <= scrubber.max) scrubberCounter += 1
+  else scrubberCounter = 0
+}
 
-
+function printState() {
+  console.log(scrubberCounter)
+  console.log(playing)
+  console.log(window.currentData)
+}
 
 
 
