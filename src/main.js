@@ -1,16 +1,11 @@
 import './style.css'
-import { setupCounter } from './js/counter.js'
+import setupMotionVisualiser from './js/visualiser.js'
 
 document.querySelector('#app').innerHTML = `
-  <div>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
+  <div style='position: absolute; width: 100%; z-index: 10; bottom: 0.5rem; text-align: center'>
+    <p style='font-family: Verdana; font-size: 0.8rem;'>Drag & Drop motion data to play</p>
   </div>
+  <div id="visualiserContainer"\>
 `
 
-setupCounter(document.querySelector('#counter'))
+setupMotionVisualiser(document.querySelector('#visualiserContainer'))
