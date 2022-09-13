@@ -86,11 +86,9 @@ function valuePlayer() {
   else scrubberCounter = 0
 }
 
-function printState() {
-  console.log(scrubberCounter)
-  console.log(playing)
-  console.log(window.currentData)
-}
+
+
+
 
 
 
