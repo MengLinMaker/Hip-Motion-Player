@@ -26,7 +26,7 @@ visualiserContainer.innerHTML=`
         onMouseOver="this.style.backgroundColor='#eeeeee'"
         onMouseOut="this.style.backgroundColor='inherit'"
       >
-        <img alt='playButton' id="playButton" style='height: 1.2rem; width: 1.2rem;'/>
+        <img alt='playButton' id="playButton" style='height: 1.2rem; width: 1.2rem; user-select: none;'/>
       </button>
       <input style="flex-grow: 1; margin-left: 0.5rem; margin-right: 1rem; height: 3.2px; accent-color: #111111;"
       type="range" id="scrubber" name="scrubber" min="0" max="0">
