@@ -13,13 +13,34 @@
 
 Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLinMaker/Hip-Motion-Capture). The [captured motion data](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Motion%20Data) is sampled at 50Hz. Each time stamp is represented by a row in the csv fle and layed out in the following format:
 
-**Waist IMU data: Column A to J**
-* Gyro (rad/s): x, y, z
-* Acceleration (m/s^2): x, y, z
-* Quaternion: w, x, y, z
+**Waist IMU data - Column A to J**
+* Gyro (rad/s): x, y, z - Column A to C
+* Acceleration (m/s^2): x, y, z - Column D to F
+* Quaternion: w, x, y, z - Column G to J
 
-**Right thigh IMU data: Column K to T**
-* Gyro, Acc, Quaternion ... same layout as above
+**Right thigh IMU data - Column K to T**
+* Gyro, Acc, Quaternion ... similar layout as above
 
-**Right thigh IMU data: Column U to AD**
-* Gyro, Acc, Quaternion ... same layout as above
+**Right thigh IMU data - Column U to AD**
+* Gyro, Acc, Quaternion ... similar layout as above
+
+
+
+<div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
+
+# How to use
+1. Download the sample data from ['Motion Data'](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Motion%20Data) folder.
+2. Drag a csv file onto the 3D model in the [demo website](https://menglinmaker-hip-motion-player.netlify.app/).
+3. Press the pause/play button or drag the input slider.
+
+Have fun!
+
+<div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
+
+# Developer instructions for integrating into other projects
+1. Download the [src/visualiser](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/src/visualiser) folder.
+2. In your project, create a div element: `<div id='visualiserID'/>`
+3. At the start of a JavaScript file `import setupMotionVisualiser from './visualiser/visualiser.js'` tailored to your respective folder layout.
+4. Evoke the function: `setupMotionVisualiser(document.querySelector('#visualiserID'), data, sampleRate)`
+
+Note: By default `data=null` and `sampleRate=50`. You can drag and drop csv files
