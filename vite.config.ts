@@ -3,8 +3,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // @ts-ignore
 //import faviconURL from './public/favicon.svg'
-//const faviconURL = './public/favicon.svg'
-const faviconURL = '/public/favicon.svg'
+//const faviconURL = 'favicon.svg'
+const faviconURL = '/assets/favicon.4a748afd.svg'
 
 
 // https://vitejs.dev/config/
