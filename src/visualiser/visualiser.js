@@ -22,11 +22,11 @@ visualiserContainer.innerHTML=`
   <div style='position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;'>
     <canvas id="visualiser" style='width: 100%;'></canvas>
     <div id='player' style='position: absolute; background-color: #ffffffdd; backdrop-filter: blur(3px); bottom: 3rem; padding: 0.3rem; width: 80%; display: flex; align-items: center; border-radius: 10rem; box-shadow: 0 1px 3px #00000044;'>
-      <button name='playButton' style='border: none; background-color: inherit; border-radius: 50%; height: 2rem; width: 2rem; display: flex; align-items: center; justify-content: center;'
+      <button id='playButton' name='playButton' style='border: none; background-color: inherit; border-radius: 50%; height: 2rem; width: 2rem; display: flex; align-items: center; justify-content: center;'
         onMouseOver="this.style.backgroundColor='#eeeeee'"
         onMouseOut="this.style.backgroundColor='inherit'"
       >
-        <img alt='playButton' id="playButton" style='height: 1.2rem; width: 1.2rem; user-select: none;'/>
+        <img alt='playButtonIcon' id="playButtonIcon" style='height: 1.2rem; width: 1.2rem; user-select: none;'/>
       </button>
       <input style="flex-grow: 1; margin-left: 0.5rem; margin-right: 1rem; height: 3.2px; accent-color: #111111;"
       type="range" id="scrubber" name="scrubber" min="0" max="0">
@@ -59,15 +59,16 @@ visualiserElement.addEventListener('drop', (e)=>{
 })
 
 const playButton = document.querySelector('#playButton')
+const playButtonIcon = document.querySelector('#playButtonIcon')
 let playing = false
-playButton.src = playIcon
+playButtonIcon.src = playIcon
 function playButtonHandler() {
   if (playing) {
-    playButton.src = playIcon
+    playButtonIcon.src = playIcon
     playing = false
     clearInterval(myValuePlayer)
   } else if (data != null) {
-    playButton.src = pausedIcon
+    playButtonIcon.src = pausedIcon
     playing = true
     myValuePlayer = setInterval(valuePlayer, 1000/dataRate)
   }
