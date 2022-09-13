@@ -1,13 +1,15 @@
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-let faviconURL = '/favicon.svg'
-
+// @ts-ignore
+//import faviconURL from './public/favicon.svg'
+//const faviconURL = './public/favicon.svg'
+const faviconURL = '/public/favicon.svg'
 
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  root: 'src',
+  root: './src',
   build: {
     outDir: '../dist'
   },
