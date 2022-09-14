@@ -6,37 +6,53 @@ import { hipSTL, rightThighSTL, leftThighSTL, playIcon, pausedIcon } from './ass
 
 import { csvToArray, getDataPosition } from './dataProcessing'
 import { initialiseScene, resizeCanvas, setupScene } from './scene'
+import { animateData, walkingAnimation } from './animation'
 
 
 
-export default function setupMotionVisualiser(visualiserContainer, data=null, dataRate=50) {
+export default function setupMotionVisualiser(visualiserContainer, data=null, dataRate=50, FPS=60) {
+
+// HTML content
+visualiserContainer.innerHTML=`
+<div style='position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;'>
+  <canvas id="visualiser" style='width: 100%;'></canvas>
+  <div id='player' style='position: absolute; background-color: #ffffffdd; backdrop-filter: blur(3px); bottom: 3rem; padding: 0.3rem; width: 80%; display: flex; align-items: center; border-radius: 10rem; box-shadow: 0 1px 3px #00000044; max-width: 600px;'>
+    <button id='playButton' name='playButton' style='border: none; background-color: inherit; border-radius: 50%; height: 2rem; width: 2rem; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem'
+      onMouseOver="this.style.backgroundColor='#eeeeee'"
+      onMouseOut="this.style.backgroundColor='inherit'"
+    >
+      <img alt='playButtonIcon' id="playButtonIcon" style='height: 1.2rem; width: 1.2rem; user-select: none;'/>
+    </button>
+    <label id='scrubberLabel' for='scrubber' style='font-size: 0.75rem; font-family: Monaco;'>0.00s</label>
+    <input style="flex-grow: 1; margin-left: 1rem; margin-right: 1rem; height: 3.2px; accent-color: #111111;"
+    type="range" id="scrubber" name="scrubber" min="0" max="0">
+  </div>
+</div>`
+
+
+
 let scrubberCounter = 0
 let myValuePlayer = null
 let dataPosition = getDataPosition(data)
 
-visualiserContainer.innerHTML=`
-  <div style='position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;'>
-    <canvas id="visualiser" style='width: 100%;'></canvas>
-    <div id='player' style='position: absolute; background-color: #ffffffdd; backdrop-filter: blur(3px); bottom: 3rem; padding: 0.3rem; width: 80%; display: flex; align-items: center; border-radius: 10rem; box-shadow: 0 1px 3px #00000044; max-width: 600px;'>
-      <button id='playButton' name='playButton' style='border: none; background-color: inherit; border-radius: 50%; height: 2rem; width: 2rem; display: flex; align-items: center; justify-content: center; margin-right: 0.5rem'
-        onMouseOver="this.style.backgroundColor='#eeeeee'"
-        onMouseOut="this.style.backgroundColor='inherit'"
-      >
-        <img alt='playButtonIcon' id="playButtonIcon" style='height: 1.2rem; width: 1.2rem; user-select: none;'/>
-      </button>
-      <label id='scrubberLabel' for='scrubber' style='font-size: 0.75rem; font-family: Monaco;'>0.00s</label>
-      <input style="flex-grow: 1; margin-left: 1rem; margin-right: 1rem; height: 3.2px; accent-color: #111111;"
-      type="range" id="scrubber" name="scrubber" min="0" max="0">
-    </div>
-  </div>
-`
-
-
-
 const scrubber = document.querySelector('#scrubber')
 const scrubberLabel = document.querySelector('#scrubberLabel')
 const visualiserElement = document.querySelector('#visualiser')
+const playButton = document.querySelector('#playButton')
+const playButtonIcon = document.querySelector('#playButtonIcon')
 
+function updateScrubber(value, dataRate) {
+  scrubber.value = value
+  scrubberCounter = value
+  scrubberLabel.innerText = (value/dataRate).toFixed(2) + 's'
+}
+
+// Update scrubber on input change
+scrubber.addEventListener('input', (e)=>{
+  updateScrubber( parseFloat(scrubber.value), dataRate)
+})
+
+// Drag and drop file event listeners
 visualiserElement.addEventListener('dragover', (e)=>{e.preventDefault()})
 visualiserElement.addEventListener('drop', (e)=>{
   e.preventDefault()
@@ -47,28 +63,21 @@ visualiserElement.addEventListener('drop', (e)=>{
       const reader = new FileReader()
       reader.readAsText(file)
       reader.onload = (e)=>{
+
         const text = e.target.result
         data = csvToArray(text)
         scrubber.max = data.length - 1
-        window.currentData = data[0]
         dataPosition = getDataPosition(data)
-        console.log(data)
-        console.log(dataPosition)
-        updateScrubber(0,dataRate)
+        updateScrubber(0, dataRate)
         if (playing == false) playButtonHandler()
+
       }
     }
   }
 })
 
-function updateScrubber(value, dataRate) {
-  scrubber.value = value
-  scrubberCounter = value
-  scrubberLabel.innerText = (value/dataRate).toFixed(2) + 's'
-}
 
-const playButton = document.querySelector('#playButton')
-const playButtonIcon = document.querySelector('#playButtonIcon')
+// Play/pause button handler
 let playing = false
 playButtonIcon.src = playIcon
 function playButtonHandler() {
@@ -79,33 +88,26 @@ function playButtonHandler() {
   } else if (data != null) {
     playButtonIcon.src = pausedIcon
     playing = true
-    myValuePlayer = setInterval(valuePlayer, 1000/dataRate)
+    myValuePlayer = setInterval(()=>{
+      updateScrubber(scrubberCounter,dataRate)
+      if (scrubberCounter < scrubber.max) scrubberCounter += 1
+      else scrubberCounter = 0
+    }, 1000/dataRate)
   }
 }
 playButton.addEventListener('click', playButtonHandler)
 
-scrubber.addEventListener('input', (e)=>{
-  updateScrubber( parseFloat(scrubber.value), dataRate)
-  window.currentData = data[scrubberCounter]
-})
-
-function valuePlayer() {
-  window.currentData = data[scrubberCounter]
-  updateScrubber(scrubberCounter,dataRate)
-  if (scrubberCounter < scrubber.max) scrubberCounter += 1
-  else scrubberCounter = 0
-}
-
+// Prepare initialised data
 if (data != null) {
   scrubber.max = data.length-1
+  playButtonHandler()
 }
 
 
 
 
 
-
-
+// Initialising 3D visulisation
 const sceneHeight = 2.8
 
 // Setting up three js canvas
@@ -123,7 +125,7 @@ setupScene(scene, sceneHeight)
 
 
 
-
+// Loading the 3D model 
 let hip
 let rightThigh
 let leftThigh
@@ -180,88 +182,27 @@ function loadLeftThigh(){
 
 
 
-
-
 // Rendering and animate at set fps
 const clock = new THREE.Clock()
 let delta = 0
-const interval = 1 / 60
+const interval = 1 / FPS
 function animate() {
   resizeCanvas(camera, renderer, visualiserContainer.clientWidth, visualiserContainer.clientHeight)
   requestAnimationFrame(animate)
-
   delta += clock.getDelta()
   if (delta > interval) {
 
     if (hip != null && rightThigh != null && leftThigh != null){
-      if (data != null) animateData()
-      else walkingAnimation(hip, leftThigh, rightThigh)
+      if (data != null) animateData(hip, rightThigh, leftThigh, data[scrubberCounter], dataPosition[scrubberCounter])
+      else walkingAnimation(hip, rightThigh, leftThigh)
       controls.update()
-      renderer.render(scene, camera)
-      delta = delta % interval
     }
 
+    renderer.render(scene, camera)
+    delta = delta % interval
   }
 }
 animate()
-
-
-
-
-
-// Animate the data
-function animateData(){
-  const currentData = data[scrubberCounter]
-  let q, qh, qr, ql
-
-  qh = new THREE.Quaternion(currentData[7], currentData[8], currentData[9], currentData[6]).normalize()
-  hip.rotation.setFromQuaternion(qh)
-  qh = new THREE.Quaternion(currentData[7], currentData[8], currentData[9], -currentData[6]).normalize()
-
-  const pos = dataPosition[scrubberCounter]
-  hip.position.x = pos[0]
-  hip.position.y = pos[1]
-  hip.position.z = pos[2]
-
-  /*/
-  const cosTh = currentData[6]**2 - currentData[9]**2
-  const sinTh = 2 * currentData[6] * currentData[9]
-  //let rotation = 360/Math.PI * Math.atan2(currentData[9],currentData[6])
-  let rotation = 180/Math.PI * Math.atan2(sinTh,cosTh)
-  rotation = (rotation+360) % 360
-  //*/
-
-  q = new THREE.Quaternion(currentData[17], currentData[18], currentData[19], currentData[16]).normalize()
-  qr = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
-  rightThigh.rotation.setFromQuaternion(qr)
-
-  q = new THREE.Quaternion(currentData[27], currentData[28], currentData[29], currentData[26]).normalize()
-  ql = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
-  leftThigh.rotation.setFromQuaternion(ql)
-}
-
-
-
-
-
-
-// Making a walking animation
-let counter = 0
-function walkingAnimation(hip, leftThigh, rightThigh){
-  const speed = 1.1
-  counter += Math.PI*interval*speed
-  const sc = Math.sin(counter)
-
-  hip.rotation.z += Math.PI/4*interval*Math.sqrt(speed)
-  hip.rotation.x = 0.08*sc
-  hip.position.z = 0.2*sc
-
-  let q = new THREE.Quaternion(0.05,0.18,0,sc-0.2)
-  leftThigh.rotation.setFromQuaternion(q)
-  q = new THREE.Quaternion(0.05,0.18,0,-sc-0.2)
-  rightThigh.rotation.setFromQuaternion(q)
-}
-
 
 
 }
