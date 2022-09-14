@@ -19,10 +19,10 @@ Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLin
 * Quaternion: w, x, y, z - Column G to J
 
 **Right thigh IMU data - Column K to T**
-* Gyro, Acc, Quaternion ... similar layout as above
+* Gyro, Acceleration, Quaternion ... similar layout as above
 
 **Right thigh IMU data - Column U to AD**
-* Gyro, Acc, Quaternion ... similar layout as above
+* Gyro, Acc, Quat ... similar layout as above
 
 
 
