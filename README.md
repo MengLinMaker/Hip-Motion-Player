@@ -42,5 +42,6 @@ Have fun!
 2. In your project, create a div element: `<div id='visualiserID'/>`
 3. At the start of a JavaScript file `import setupMotionVisualiser from './visualiser/visualiser.js'` tailored to your respective folder layout.
 4. Evoke the function: `setupMotionVisualiser(document.querySelector('#visualiserID'), data, sampleRate)`
+5. Input data should be formated as n by 30 array. Here is an [example data](https://github.com/MengLinMaker/Hip-Motion-Player/blob/main/src/sampleData.js).
 
 Note: By default `data=null` and `sampleRate=50`. You can drag and drop CSV files
