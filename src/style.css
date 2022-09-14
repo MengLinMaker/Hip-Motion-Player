@@ -12,18 +12,3 @@ body {
   height: 100%;
   width: 100%;
 }
-
-input[type=range] {
-  -webkit-appearance: none;
-  background-color: #aaaaaa;
-  border-radius: 3px;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  border: none;
-  height:8px;
-  width: 8px;
-  border-radius: 50%;
-  background: #333;
-}

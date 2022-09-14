@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 
+import './visualiser.css'
+
 import { hipSTL, rightThighSTL, leftThighSTL, playIcon, pausedIcon } from './asset'
 
 import { csvToArray, getDataPosition } from './dataProcessing'
