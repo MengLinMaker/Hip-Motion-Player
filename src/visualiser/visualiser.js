@@ -2,21 +2,17 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 
-import relativePosition from './relativePosition'
-import csvToArray from './csvToArray'
+import { hipSTL, rightThighSTL, leftThighSTL, playIcon, pausedIcon } from './asset'
 
-import hipSTL from './asset/hip.stl?url'
-import rightThighSTL from './asset/rightThigh.stl?url'
-import leftThighSTL from './asset/leftThigh.stl?url'
-
-import playIcon from './asset/icons8-play-96.png?url'
-import pausedIcon from './asset/icons8-pause-96.png?url'
+import { csvToArray, getDataPosition } from './dataProcessing'
+import { initialiseScene, resizeCanvas, setupScene } from './scene'
 
 
 
 export default function setupMotionVisualiser(visualiserContainer, data=null, dataRate=50) {
 let scrubberCounter = 0
 let myValuePlayer = null
+let dataPosition = getDataPosition(data)
 
 visualiserContainer.innerHTML=`
   <div style='position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;'>
@@ -34,11 +30,14 @@ visualiserContainer.innerHTML=`
     </div>
   </div>
 `
+
+
+
 const scrubber = document.querySelector('#scrubber')
 const scrubberLabel = document.querySelector('#scrubberLabel')
 const visualiserElement = document.querySelector('#visualiser')
-visualiserElement.addEventListener('dragover', (e)=>{e.preventDefault()})
 
+visualiserElement.addEventListener('dragover', (e)=>{e.preventDefault()})
 visualiserElement.addEventListener('drop', (e)=>{
   e.preventDefault()
   e.stopPropagation()
@@ -52,6 +51,9 @@ visualiserElement.addEventListener('drop', (e)=>{
         data = csvToArray(text)
         scrubber.max = data.length - 1
         window.currentData = data[0]
+        dataPosition = getDataPosition(data)
+        console.log(data)
+        console.log(dataPosition)
         updateScrubber(0,dataRate)
         if (playing == false) playButtonHandler()
       }
@@ -90,7 +92,7 @@ scrubber.addEventListener('input', (e)=>{
 function valuePlayer() {
   window.currentData = data[scrubberCounter]
   updateScrubber(scrubberCounter,dataRate)
-  if (scrubberCounter <= scrubber.max) scrubberCounter += 1
+  if (scrubberCounter < scrubber.max) scrubberCounter += 1
   else scrubberCounter = 0
 }
 
@@ -103,64 +105,31 @@ if (data != null) {
 
 
 
+
 const sceneHeight = 2.8
 
 // Setting up three js canvas
 const scene = new THREE.Scene()
-scene.background = new THREE.Color( 0xffffff )
-
 const camera = new THREE.PerspectiveCamera(30, window.innerWidth/window.innerHeight, 0.1, 1000)
-camera.up.set( 0, 0, 1 )
-scene.position.set(0,0,sceneHeight)
-camera.position.set( 24, 12, 12 )
-
 const renderer = new THREE.WebGLRenderer({
   canvas: visualiserElement,
 })
-renderer.setPixelRatio(window.devicePixelRatio)
-renderer.setSize(window.innerWidth, window.innerHeight)
-renderer.render(scene, camera)
-renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
-renderer.render(scene, camera)
+const controls = new OrbitControls(camera, renderer.domElement) // Importing orbit controls
 
-// Importing orbit controls
-const controls = new OrbitControls(camera, renderer.domElement)
-
-// Window resize functionality
-function resizeCanvas() {
-  const aspectRatio = visualiserContainer.clientWidth/ visualiserContainer.clientHeight
-  if (camera.aspect != aspectRatio) {
-    camera.aspect = aspectRatio
-    camera.updateProjectionMatrix()
-    renderer.setSize( visualiserContainer.clientWidth, visualiserContainer.clientHeight )
-  }
-}
+initialiseScene(scene, camera, renderer, sceneHeight)
+setupScene(scene, sceneHeight)
 
 
 
 
 
 
-// Ground plane
-//*/
-const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry( 400, 400 ),
-    new THREE.MeshPhysicalMaterial( { color: 0xfffffff } )
-)
-plane.translateZ(-10)
-scene.add( plane )
-plane.receiveShadow = true
-//*/
-
-
-
-
-
+let hip
+let rightThigh
+let leftThigh
 const loader = new STLLoader()
 const material = new THREE.MeshPhysicalMaterial( { color: 0xaa8866, clearcoat: 0.8, roughness: 0.5, clearcoatRoughness: 0.5 } )
 
-let hip
 loader.load(
   hipSTL,
   function (geometry) {
@@ -177,7 +146,6 @@ loader.load(
   }
 )
 
-let rightThigh
 function loadRightThigh(){
   loader.load(
     rightThighSTL,
@@ -193,7 +161,6 @@ function loadRightThigh(){
   )
 }
 
-let leftThigh
 function loadLeftThigh(){
   loader.load(
     leftThighSTL,
@@ -215,46 +182,20 @@ function loadLeftThigh(){
 
 
 
-
-// Defining lights
-scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) )
-addShadowedLight( 10, 10, 50 + sceneHeight, 0xffffff, 2.5 )
-addShadowedLight( 50, 0, - 50 + sceneHeight, 0xffccaa, 3 )
-addShadowedLight( -10, -5, -10 + sceneHeight, 0xccaa88, 3 )
-function addShadowedLight( x, y, z, color, intensity ) {
-  const directionalLight = new THREE.DirectionalLight( color, intensity )
-  directionalLight.position.set( x, y, z )
-  scene.add( directionalLight )
-  directionalLight.castShadow = true
-  const side = 15
-  directionalLight.shadow.camera.top = side
-  directionalLight.shadow.camera.bottom = -side
-  directionalLight.shadow.camera.left = side
-  directionalLight.shadow.camera.right = -side
-  directionalLight.shadow.mapSize.width = 2**10
-  directionalLight.shadow.mapSize.height = 2**10
-}
-
-
-
-
-
-
-
-
 // Rendering and animate at set fps
 const clock = new THREE.Clock()
 let delta = 0
 const interval = 1 / 60
 function animate() {
-  resizeCanvas()
+  resizeCanvas(camera, renderer, visualiserContainer.clientWidth, visualiserContainer.clientHeight)
   requestAnimationFrame(animate)
+
   delta += clock.getDelta()
   if (delta > interval) {
 
     if (hip != null && rightThigh != null && leftThigh != null){
-      if (window.currentData != null) animateData()
-      else walkingAnimation()
+      if (data != null) animateData()
+      else walkingAnimation(hip, leftThigh, rightThigh)
       controls.update()
       renderer.render(scene, camera)
       delta = delta % interval
@@ -269,38 +210,32 @@ animate()
 
 
 // Animate the data
-let q, qh, qr, ql
-const position = new relativePosition()
 function animateData(){
-  const data = window.currentData
+  const currentData = data[scrubberCounter]
+  let q, qh, qr, ql
 
-  qh = new THREE.Quaternion(data[7], data[8], data[9], data[6]).normalize()
-  const vector = new THREE.Vector3(data[3], data[4], data[5])
-  vector.applyQuaternion(qh)
+  qh = new THREE.Quaternion(currentData[7], currentData[8], currentData[9], currentData[6]).normalize()
   hip.rotation.setFromQuaternion(qh)
-  qh = new THREE.Quaternion(data[7], data[8], data[9], -data[6]).normalize()
+  qh = new THREE.Quaternion(currentData[7], currentData[8], currentData[9], -currentData[6]).normalize()
 
-  if (playing == true) {
-    vector.z = vector.z - 9.81
-    const pos = position.update([vector.x, vector.y, vector.z])
-    hip.position.x = pos[0]
-    hip.position.y = pos[1]
-    hip.position.z = pos[2] 
-  }
+  const pos = dataPosition[scrubberCounter]
+  hip.position.x = pos[0]
+  hip.position.y = pos[1]
+  hip.position.z = pos[2]
 
   /*/
-  const cosTh = data[6]**2 - data[9]**2
-  const sinTh = 2 * data[6] * data[9]
-  //let rotation = 360/Math.PI * Math.atan2(data[9],data[6])
+  const cosTh = currentData[6]**2 - currentData[9]**2
+  const sinTh = 2 * currentData[6] * currentData[9]
+  //let rotation = 360/Math.PI * Math.atan2(currentData[9],currentData[6])
   let rotation = 180/Math.PI * Math.atan2(sinTh,cosTh)
   rotation = (rotation+360) % 360
   //*/
 
-  q = new THREE.Quaternion(data[17], data[18], data[19], data[16]).normalize()
+  q = new THREE.Quaternion(currentData[17], currentData[18], currentData[19], currentData[16]).normalize()
   qr = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
   rightThigh.rotation.setFromQuaternion(qr)
 
-  q = new THREE.Quaternion(data[27], data[28], data[29], data[26]).normalize()
+  q = new THREE.Quaternion(currentData[27], currentData[28], currentData[29], currentData[26]).normalize()
   ql = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
   leftThigh.rotation.setFromQuaternion(ql)
 }
@@ -312,8 +247,8 @@ function animateData(){
 
 // Making a walking animation
 let counter = 0
-const speed = 1.1
-function walkingAnimation(){
+function walkingAnimation(hip, leftThigh, rightThigh){
+  const speed = 1.1
   counter += Math.PI*interval*speed
   const sc = Math.sin(counter)
 
@@ -321,11 +256,12 @@ function walkingAnimation(){
   hip.rotation.x = 0.08*sc
   hip.position.z = 0.2*sc
 
-  q = new THREE.Quaternion(0.05,0.18,0,sc-0.2)
+  let q = new THREE.Quaternion(0.05,0.18,0,sc-0.2)
   leftThigh.rotation.setFromQuaternion(q)
   q = new THREE.Quaternion(0.05,0.18,0,-sc-0.2)
   rightThigh.rotation.setFromQuaternion(q)
 }
+
 
 
 }
