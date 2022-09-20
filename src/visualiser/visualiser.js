@@ -6,13 +6,13 @@ import './visualiser.css'
 
 import { hipSTL, rightThighSTL, leftThighSTL, playIcon, pausedIcon } from './asset'
 
-import { csvToArray, getDataPosition } from './dataProcessing'
+import { csvToArray, getCachedBlobUrl, getDataPosition } from './dataProcessing'
 import { initialiseScene, resizeCanvas, setupScene } from './scene'
 import { animateData, walkingAnimation } from './animation'
 
 
 
-export default function setupMotionVisualiser(visualiserContainer, data=null, dataRate=50, FPS=60) {
+export default async function setupMotionVisualiser(visualiserContainer, data=null, dataRate=50, FPS=60) {
 
 // HTML content
 visualiserContainer.innerHTML=`
@@ -127,15 +127,20 @@ setupScene(scene, sceneHeight)
 
 
 
-// Loading the 3D model 
-let hip
-let rightThigh
-let leftThigh
+// Loading 3D model 
+let hip, hipSTLurl
+let rightThigh, rightThighSTLurl
+let leftThigh, leftThighSTLurl
+
+hipSTLurl = await getCachedBlobUrl(hipSTL, 'hipSTL')
+rightThighSTLurl = await getCachedBlobUrl(rightThighSTL, 'rightThighSTL')
+leftThighSTLurl = await getCachedBlobUrl(leftThighSTL, 'leftThighSTL')
+
 const loader = new STLLoader()
 const material = new THREE.MeshPhysicalMaterial( { color: 0xaa8866, clearcoat: 0.8, roughness: 0.5, clearcoatRoughness: 0.5 } )
 
 loader.load(
-  hipSTL,
+  hipSTLurl,
   function (geometry) {
     const mesh = new THREE.Mesh( geometry, material )
     mesh.castShadow = true
@@ -152,7 +157,7 @@ loader.load(
 
 function loadRightThigh(){
   loader.load(
-    rightThighSTL,
+    rightThighSTLurl,
     function (geometry) {
       const mesh = new THREE.Mesh( geometry, material )
       mesh.castShadow = true
@@ -167,7 +172,7 @@ function loadRightThigh(){
 
 function loadLeftThigh(){
   loader.load(
-    leftThighSTL,
+    leftThighSTLurl,
     function (geometry) {
       const mesh = new THREE.Mesh( geometry, material )
       mesh.castShadow = true
