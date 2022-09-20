@@ -49,7 +49,7 @@ visualiserElement.addEventListener('drop', (e)=>{
         dataPosition = getDataPosition(data)
 
         sliderPlayer.setScrubberMax(data.length - 1)
-        sliderPlayer.updateScrubber(0, dataRate)
+        sliderPlayer.updateScrubber(0)
         if (sliderPlayer.isPlaying() == false) sliderPlayer.playButtonHandler()
 
       }
