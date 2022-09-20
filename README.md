@@ -38,10 +38,11 @@ Have fun!
 <div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
 
 # Developer instructions for integrating into other projects
-1. Download the [src/visualiser](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/src/visualiser) folder.
-2. In your project, create a div element: `<div id='visualiserID'/>`
-3. At the start of a JavaScript file `import setupMotionVisualiser from './visualiser/visualiser.js'` tailored to your respective folder layout.
-4. Evoke the function: `setupMotionVisualiser(document.querySelector('#visualiserID'), data, sampleRate)`
-5. Input data should be formated as n by 30 array. Here is an [example data](https://github.com/MengLinMaker/Hip-Motion-Player/blob/main/src/sampleData.js).
+1. Install dependencies at project root directory with `npm i localforage three`
+2. Download the [src/visualiser](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/src/visualiser) folder.
+3. In your project, create a div element: `<div id='visualiserID'/>`
+4. At the start of a JavaScript file `import setupMotionVisualiser from './visualiser/visualiser.js'` tailored to your respective folder layout.
+5. Evoke the function: `setupMotionVisualiser(document.querySelector('#visualiserID'), data, sampleRate)`
+6. Input data should be formated as n by 30 array. Here is an [example data](https://github.com/MengLinMaker/Hip-Motion-Player/blob/main/src/sampleData.js).
 
 Note: By default `data=null` and `sampleRate=50`. You can drag and drop CSV files
