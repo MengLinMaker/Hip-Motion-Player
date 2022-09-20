@@ -4,7 +4,8 @@ import * as THREE from 'three'
 
 // Making a walking animation
 let counter = 0
-export default function walkingAnimation(hip, rightThigh, leftThigh){
+export default function walkingAnimation(hip, rightThigh, leftThigh, FPS){
+  const interval = 1/FPS
   const speed = 1.1
   counter += Math.PI*interval*speed
   const sc = Math.sin(counter)
