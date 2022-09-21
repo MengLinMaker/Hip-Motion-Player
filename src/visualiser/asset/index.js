@@ -1,4 +1,4 @@
-import hipSTL from './hip.stl?url'
+import * as hipSTL from './hip.stl?url'
 import rightThighSTL from './rightThigh.stl?url'
 import leftThighSTL from './leftThigh.stl?url'
 import playIcon from './icons8-play-96.png?url'

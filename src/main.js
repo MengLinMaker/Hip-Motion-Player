@@ -1,5 +1,5 @@
 import './style.css'
-import setupMotionVisualiser from './Hip-Motion-Player/visualiser.js'
+import setupMotionVisualiser from './visualiser/visualiser'
 import sampleData from './sampleData.js'
 
 document.querySelector('#app').innerHTML = `

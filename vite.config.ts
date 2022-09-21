@@ -11,6 +11,7 @@ export default defineConfig({
   build: {
     outDir: '../dist'
   },
+  assetsInclude: ['**/*.stl','**/*.png'],
   plugins: [
     VitePWA({
       includeAssets: [faviconURL],
