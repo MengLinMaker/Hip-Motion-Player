@@ -37,7 +37,7 @@ Have fun!
 
 <div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
 
-# Developer instructions for integrating into other projects
+# Integrating into other projects
 1. Install dependencies in project root directory with `npm i localforage three`
 2. Download the [src/visualiser](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/src/visualiser) folder.
 3. In your project, create a div element: `<div id='visualiserID'/>`
