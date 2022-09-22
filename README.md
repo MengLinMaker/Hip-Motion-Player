@@ -29,7 +29,7 @@ Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLin
 <div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
 
 # How to use
-1. Download the sample data from ['Motion Data'](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Motion%20Data) folder.
+1. Download the sample data from ['Raw Motion Data'](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Raw%20Motion%20Data) folder.
 2. Drag a CSV file onto the 3D model in the [demo website](https://menglinmaker-hip-motion-player.netlify.app/).
 3. Press the pause/play button or drag the input slider.
 
