@@ -20,6 +20,7 @@ def plotGyroNorm(data, timeStamp, ax=False):
   ax.set_xlabel('Time (s)')
   ax.set_ylabel('Ang vel (rad/s)')
   ax.axis([0, timeStamp[-1], 0, 7])
+  ax.xaxis.set_ticks(np.arange(0, timeStamp[-1], 1))
   ax.grid()
 
 
@@ -36,6 +37,7 @@ def plotAccNorm(data, timeStamp, ax=False):
   ax.legend(loc="upper left")
   ax.set_xlabel('Time (s)')
   ax.xaxis.set_label_coords(1, -.2)
+  ax.xaxis.set_ticks(np.arange(0, timeStamp[-1], 1))
   ax.set_ylabel('Acc (m/s^2)')
   ax.axis([0, timeStamp[-1], 0, 15])
   ax.grid()
@@ -57,6 +59,7 @@ def plotCosineHeight(quat, timeStamp, ax=False):
   ax.legend(loc="upper left")
   ax.set_xlabel('Time (s)')
   ax.xaxis.set_label_coords(1,-.2)
+  ax.xaxis.set_ticks(np.arange(0, timeStamp[-1], 1))
   ax.set_ylabel('Cosine height (unitless)')
   ax.axis([0, timeStamp[-1], -1, 1])
   ax.grid()

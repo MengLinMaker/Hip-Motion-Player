@@ -5,16 +5,19 @@ from utility import getCsvData, butterFilter, saveCsvData, norm
 from plots import plotCosineHeight, plotAccNorm, plotGyroNorm, densityPlot
 
 
+# Global variables
+sampleRate = 50
+samplePeriod = 1/sampleRate
+
+
 def analyse(filePath):
   data = getCsvData(filePath)
-  sampleRate = 50
-  samplePeriod = 1/sampleRate
   timeStamp = np.linspace(0, len(data)*samplePeriod, len(data))
 
   data2 = butterFilter(data.T, cutoff=20, fs=sampleRate, type='high', order=2).T
 
   plt.ion()
-  fig, ax = plt.subplots(4, 1, figsize=(20, 8))
+  fig, ax = plt.subplots(4, 1, figsize=(10, 8))
   plt.subplots_adjust(hspace=0.35)
 
   #plotGyroNorm(data, timeStamp, ax[0])
@@ -44,17 +47,23 @@ def analyse(filePath):
 
 if __name__ == "__main__":
   #'''
-  for i in range(1,6):
-    filePath = './Raw Motion Data/Fall Data/Fall Front/Fall Front ('+str(i)+').csv'
+  for i in range(1,20+1):
+    filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back ('+str(i)+').csv'
     analyse(filePath)
     data = getCsvData(filePath)
+
+    startTime = input("Start time: ")
+    endTime = input("End time: ")
+    print('')
     
-    #saveCsvData('test ('+str(i)+').csv',data[100:300,:])
-    #analyse('test ('+str(i)+').csv')
+    filePath = './Clean Motion Data/Fall/Fall Back ('+str(i)+').csv'
+    if (startTime != '' and endTime != ''):
+      startID = int(np.floor(sampleRate*float(startTime)))
+      endID = int(np.floor(sampleRate*float(endTime)))
+      saveCsvData(filePath, data[startID:endID, :])
+      analyse(filePath)
     
   #'''
-  typed = input("Press [enter] to finish.")
-  print(typed)
   '''
   filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back (2).csv'
   analyse(filePath)
