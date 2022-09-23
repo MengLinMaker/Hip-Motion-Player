@@ -45,11 +45,9 @@ def analyse(filePath):
   fig.suptitle(filePath.split('/')[-1])
 
 
-if __name__ == "__main__":
-  #'''
-  for i in range(17,20+1):
-    #filePath = './Raw Motion Data/Non-Fall Data/Sit/Sit ('+str(i)+').csv'
-    filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back ('+str(i)+').csv'
+def generateWindowedSamples():
+  for i in range(20, 20+1):
+    filePath = './Raw Motion Data/Non-Fall Data/Stair/Stair ('+str(i)+').csv'
 
     analyse(filePath)
     data = getCsvData(filePath)
@@ -58,16 +56,20 @@ if __name__ == "__main__":
     endTime = '1'
     #endTime = input("End time: ")
     print('')
-    
-    filePath = './Clean Motion Data/Non Fall/Stand ('+str(i)+').csv'
+
+    filePath = './Clean Motion Data/Non Fall/Stair ('+str(i)+').csv'
     if (startTime != '' and endTime != ''):
       startID = int(np.floor(sampleRate*float(startTime)))
       endTime = float(startTime)+3
       endID = int(np.floor(sampleRate*float(endTime)))
       saveCsvData(filePath, data[startID:endID, :])
       analyse(filePath)
-    
-  #'''
+
+
+if __name__ == "__main__":
+  
+  generateWindowedSamples()
+
   '''
   filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back (2).csv'
   analyse(filePath)
