@@ -48,7 +48,7 @@ visualiserElement.addEventListener('drop', (e)=>{
         data = csvToArray(text)
         dataPosition = getDataPosition(data)
 
-        sliderPlayer.setScrubberMax(data.length - 1)
+        sliderPlayer.setScrubberMax(data.length - 2)
         sliderPlayer.updateScrubber(0)
         if (sliderPlayer.isPlaying() == false) sliderPlayer.playButtonHandler()
 

@@ -1,3 +1,4 @@
+from os import pathsep
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,14 +12,14 @@ samplePeriod = 1/sampleRate
 
 
 def analyse(filePath):
-  data = getCsvData(filePath)
-  timeStamp = np.linspace(0, len(data)*samplePeriod, len(data))
-
-  data2 = butterFilter(data.T, cutoff=20, fs=sampleRate, type='high', order=2).T
-
   plt.ion()
   fig, ax = plt.subplots(4, 1, figsize=(10, 8))
   plt.subplots_adjust(hspace=0.35)
+  fig.suptitle(filePath.split('/')[-1])
+
+  data = getCsvData(filePath)
+  timeStamp = np.linspace(0, len(data)*samplePeriod, len(data))
+  data2 = butterFilter(data.T, cutoff=20, fs=sampleRate, type='high', order=2).T
 
   #plotGyroNorm(data, timeStamp, ax[0])
   #ax[0].set_title('2nd order 20 Hz high pass Butterworth')
@@ -32,22 +33,13 @@ def analyse(filePath):
   plotCosineHeight(data[:, [29, 26, 27, 28]], timeStamp, ax[2])
   ax[2].set_title('Left global cosine height')
 
-  #plotAccNorm(data, timeStamp, ax[0])
-  #ax[0].set_title('No filter normalised acceleration')
-
   plotAccNorm(data2, timeStamp, ax[3])
   ax[3].set_title('2nd order 20 Hz high pass Butterworth normalised acceleration')
 
-  #densityPlot(data[:, 3])
-  #densityPlot(data[:, 4])
-  #densityPlot(data[:, 5])
-
-  fig.suptitle(filePath.split('/')[-1])
-
 
 def generateWindowedSamples():
-  for i in range(5, 20+1):
-    filePath = './Raw Motion Data/Non-Fall Data/Walk/Walk ('+str(i)+').csv'
+  for i in range(1, 20+1):
+    filePath = './Raw Motion Data/Non-Fall Data/Unlabelled/Unlabelled ('+str(i)+').csv'
 
     analyse(filePath)
     data = getCsvData(filePath)
@@ -57,7 +49,7 @@ def generateWindowedSamples():
     #endTime = input("End time: ")
     print('')
 
-    filePath = './Clean Motion Data/Non Fall/Walk ('+str(i)+').csv'
+    filePath = './Clean Motion Data/Unlabelled/Unlabelled ('+str(i)+').csv'
     if (startTime != '' and endTime != ''):
       startID = int(np.floor(sampleRate*float(startTime)))
       endTime = float(startTime)+3
@@ -66,9 +58,24 @@ def generateWindowedSamples():
       analyse(filePath)
 
 
+def parsePoseFile(fileSrcPath, fileDstPath, ID):
+  pathString = fileSrcPath.split('%')
+
+  data = []
+  for i in range(1, 20+1):
+    fileSrcPath = pathString[0] + str(i) + pathString[1]
+    dataPoint = getCsvData(fileSrcPath)[ID, :]
+    data.append(dataPoint)
+  data = np.array(data)
+  #print(data)
+  saveCsvData(fileDstPath, data)
+
+
 if __name__ == "__main__":
-  
-  generateWindowedSamples()
+  #generateWindowedSamples()
+  fileSrcPath = './Clean Motion Data/Non Fall/Walk (%).csv'
+  fileDstPath = './Clean Motion Data/Pose/Stand.csv'
+  parsePoseFile(fileSrcPath, fileDstPath, -1)
 
   '''
   filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back (2).csv'
