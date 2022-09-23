@@ -47,8 +47,8 @@ def analyse(filePath):
 
 if __name__ == "__main__":
   #'''
-  for i in range(13,20+1):
-    filePath = './Raw Motion Data/Non-Fall Data/Jump/Jump ('+str(i)+').csv'
+  for i in range(1,20+1):
+    filePath = './Raw Motion Data/Non-Fall Data/Run/Run ('+str(i)+').csv'
     analyse(filePath)
     data = getCsvData(filePath)
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     endTime = float(startTime)+3
     print('')
     
-    filePath = './Clean Motion Data/Non Fall/Jump ('+str(i)+').csv'
+    filePath = './Clean Motion Data/Non Fall/Run ('+str(i)+').csv'
     if (startTime != '' and endTime != ''):
       startID = int(np.floor(sampleRate*float(startTime)))
       endID = int(np.floor(sampleRate*float(endTime)))
