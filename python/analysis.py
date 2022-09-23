@@ -46,8 +46,8 @@ def analyse(filePath):
 
 
 def generateWindowedSamples():
-  for i in range(20, 20+1):
-    filePath = './Raw Motion Data/Non-Fall Data/Stair/Stair ('+str(i)+').csv'
+  for i in range(5, 20+1):
+    filePath = './Raw Motion Data/Non-Fall Data/Walk/Walk ('+str(i)+').csv'
 
     analyse(filePath)
     data = getCsvData(filePath)
@@ -57,7 +57,7 @@ def generateWindowedSamples():
     #endTime = input("End time: ")
     print('')
 
-    filePath = './Clean Motion Data/Non Fall/Stair ('+str(i)+').csv'
+    filePath = './Clean Motion Data/Non Fall/Walk ('+str(i)+').csv'
     if (startTime != '' and endTime != ''):
       startID = int(np.floor(sampleRate*float(startTime)))
       endTime = float(startTime)+3
