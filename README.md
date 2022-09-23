@@ -1,4 +1,4 @@
-<h1 align="center"> Hip Motion Capture - <a href="https://menglinmaker-hip-motion-player.netlify.app/">Demo</a></h1>
+<h1 align="center"> Hip Motion Player - <a href="https://menglinmaker-hip-motion-player.netlify.app/">Demo</a></h1>
 
 <div align="center">
   <img width="500" src="https://user-images.githubusercontent.com/39476147/189935030-371cc4b4-a2a7-4ff3-9d71-7a1369c090a9.gif"
