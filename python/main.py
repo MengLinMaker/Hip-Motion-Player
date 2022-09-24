@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import glob
-from ML import KNN, getMLperformance
+from ML import getMLperformance, KNN, Naive_Bayesian, SVM
 
 from utility import VIF, generateDataFrame, poseFeature
 from CSV import parsePoseFile
@@ -27,9 +27,7 @@ if __name__ == "__main__":
              'Left X', 'Left Y', 'Left Z']
   df = generateDataFrame(filePaths, poseFeature, headers)
 
-  plt.figure(figsize=(20, 10))
-  plt.title('Scatter plot matrix of features for "' + df.columns[0] + '" detection')
-  sns.pairplot(df, hue='Pose', palette='Tab10')
+  #sns.pairplot(df, hue='Pose', palette='Set2')
 
 
   #sns.heatmap(df.corr(), annot=True, vmin=-1, vmax=1)
@@ -41,7 +39,7 @@ if __name__ == "__main__":
   categories = []
   for filePath in filePaths:
     categories.append( filePath.split('/')[-1].split('.')[0] )
-  #getMLperformance(df, categories, KNN)
+  getMLperformance(X, categories, Naive_Bayesian, 1000)
   #'''
 
 
