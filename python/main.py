@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import glob
 import seaborn as sns
-from KNN import KNN
+import glob
+from ML import KNN, getMLperformance
 
 from utility import VIF, generateDataFrame, poseFeature
 from CSV import parsePoseFile
@@ -26,19 +26,27 @@ if __name__ == "__main__":
              'Right X', 'Right Y', 'Right Z',
              'Left X', 'Left Y', 'Left Z']
   df = generateDataFrame(filePaths, poseFeature, headers)
-  #sns.pairplot(df, hue='Pose', palette='Tab10')
+
+  plt.figure(figsize=(20, 10))
+  plt.title('Scatter plot matrix of features for "' + df.columns[0] + '" detection')
+  sns.pairplot(df, hue='Pose', palette='Tab10')
+
+
   #sns.heatmap(df.corr(), annot=True, vmin=-1, vmax=1)
   
   X = df[['Pose','Waist X', 'Waist Z',
           'Right Y', 'Right Z',
           'Left Y', 'Left Z']]
   
-  KNN(X)
+  categories = []
+  for filePath in filePaths:
+    categories.append( filePath.split('/')[-1].split('.')[0] )
+  #getMLperformance(df, categories, KNN)
   #'''
 
 
-  #sns.heatmap(X.corr(), annot=True, vmin=-1, vmax=1)
-  #sns.pairplot(X, hue='Pose', palette='tab10')
+  #sns.heatmap(df.corr(), annot=True, vmin=-1, vmax=1)
+  #sns.pairplot(df, hue='Pose', palette='tab10')
   #plt.subplots_adjust(bottom=0.12, top=0.88)
   #plt.show()
 
