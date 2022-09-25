@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial.transform import Rotation as R
-from scipy.signal import butter, lfilter
+from scipy.signal import butter, lfilter, iirpeak, iirfilter
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from globalVariables import sampleRate, samplePeriod, subSample
+
 
 from CSV import getCsvData
 
@@ -21,6 +23,19 @@ def butterFilter(data, cutoff, fs, type='low', order=2):
   return y
 
 
+def butterIIR(data, cutoff, fs, order=1):
+  Wn = cutoff / fs
+  b, a = iirfilter(order, Wn, btype='highpass', ftype='butter')
+  y = lfilter(b, a, data)
+  return y
+
+
+def peakFilter(data, cutoff, Q, fs):
+  b, a = iirpeak(cutoff, Q, fs)
+  y = lfilter(b, a, data)
+  return y
+
+
 def VIF(data):
   # the calculation of variance inflation requires a constant
   #data['intercept'] = 0
@@ -31,7 +46,6 @@ def VIF(data):
   vif["VIF"] = [variance_inflation_factor(
       data.values, i) for i in range(data.shape[1])]
   return vif[vif['Variable'] != 'intercept']
-
 
 
 def quat2cosHeight(quat):
@@ -50,12 +64,19 @@ def quat2cosHeight(quat):
 
 
 def poseFeature(data):
-  orientationFeature = np.c_[
-    quat2cosHeight(data[:, [9, 6, 7, 8]]).T,
-    quat2cosHeight(data[:, [19, 16, 17, 18]]).T,
-    quat2cosHeight(data[:, [29, 26, 27, 28]]).T
-  ]
-  return orientationFeature
+  if data.ndim == 2:
+    feature = np.c_[
+      quat2cosHeight(data[:, [9, 6, 7, 8]]).T,
+      quat2cosHeight(data[:, [19, 16, 17, 18]]).T,
+      quat2cosHeight(data[:, [29, 26, 27, 28]]).T
+    ]
+  else:
+    feature = np.r_[
+      quat2cosHeight(data[[9, 6, 7, 8]]).T,
+      quat2cosHeight(data[[19, 16, 17, 18]]).T,
+      quat2cosHeight(data[[29, 26, 27, 28]]).T
+    ]
+  return feature
 
 
 def generateDataFrame(filePaths, getFeature, headers=False):
@@ -73,3 +94,23 @@ def generateDataFrame(filePaths, getFeature, headers=False):
 
   if headers == False: return pd.DataFrame(allData)
   else: return pd.DataFrame(allData, columns=headers)
+
+
+def motionFeature(data):
+  dataHigh = butterIIR(data.T, 1, sampleRate/subSample, 2).T
+  waistAccNorm = norm(dataHigh[:, 3:6])
+  rightAccNorm = norm(dataHigh[:, 13:16])
+  leftAccNorm = norm(dataHigh[:, 23:26])
+
+  aveAccNorm = np.array([np.average(waistAccNorm), np.average(rightAccNorm), np.average(leftAccNorm)])
+  aveAccEnergy = np.array([np.average(waistAccNorm**2), np.average(rightAccNorm**2), np.average(leftAccNorm**2)])
+  energyRatio = aveAccEnergy/aveAccNorm**2
+
+  orientationFeature = poseFeature(data)
+
+  feature = np.r_[
+    orientationFeature[0,:],
+    orientationFeature[-1,:],
+    np.r_[aveAccNorm, aveAccEnergy, energyRatio]
+  ]
+  return feature

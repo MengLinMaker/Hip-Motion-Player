@@ -3,11 +3,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import glob
-from ML import getMLperformance, KNN, Naive_Bayesian, SVM
+from ML import Random_Forest, getMLperformance, KNN, Naive_Bayesian, SVM, Decision_Tree, Logistic_Regression
 
-from utility import VIF, generateDataFrame, poseFeature
-from CSV import parsePoseFile
-from plots import plotTimeGraphs
+from utility import VIF, generateDataFrame, motionFeature, poseFeature
+from CSV import getCsvData, parsePoseFile
+from plots import plotTimeGraphs, generateWindowedSamples
 from globalVariables import sampleRate
 
 
@@ -20,15 +20,14 @@ if __name__ == "__main__":
   parsePoseFile(fileSrcPath, fileDstPath, -1)
   #'''
 
-  #'''
-  filePaths = glob.glob('./Clean Motion Data/Pose/*.csv')
+  '''
+  filePaths = glob.glob('./Pose/*.csv')
   headers = ['Pose', 'Waist X', 'Waist Y', 'Waist Z',
              'Right X', 'Right Y', 'Right Z',
              'Left X', 'Left Y', 'Left Z']
   df = generateDataFrame(filePaths, poseFeature, headers)
 
   #sns.pairplot(df, hue='Pose', palette='Set2')
-
 
   #sns.heatmap(df.corr(), annot=True, vmin=-1, vmax=1)
   
@@ -39,7 +38,7 @@ if __name__ == "__main__":
   categories = []
   for filePath in filePaths:
     categories.append( filePath.split('/')[-1].split('.')[0] )
-  getMLperformance(X, categories, Naive_Bayesian, 1000)
+  #getMLperformance(df, categories, Random_Forest, 1000)
   #'''
 
 
@@ -50,25 +49,38 @@ if __name__ == "__main__":
 
   #print(VIF(X))
 
-  '''
-  filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back (2).csv'
-  plotTimeGraphs(filePath)
-  plt.show()
   #'''
+  filePath = './Raw Motion Data/Fall Data/Fall Front/Fall Front (1).csv'
+  #filePath = './Raw Motion Data/Non-Fall Data/Walk/Walk (20).csv'
+  #filePath = './Raw Motion Data/Non-Fall Data/Run/Run (20).csv'
+  #filePath = './Raw Motion Data/Non-Fall Data/Stair/Stair (20).csv'
+  #filePath = './Raw Motion Data/Fall Data/Fall Right/Fall Right (20).csv'
 
-  '''
-  filePath = './Raw Motion Data/Fall Data/Fall Back/Fall Back (2).csv'
-  analyse(filePath)
-  filePath = './Raw Motion Data/Fall Data/Fall Right/Fall Right (2).csv'
-  analyse(filePath)
-  filePath = './Raw Motion Data/Fall Data/Fall Left/Fall Left (2).csv'
-  analyse(filePath)
-  filePath = './Raw Motion Data/Non-Fall Data/Stair/Stair (2).csv'
-  analyse(filePath)
-  filePath = './Raw Motion Data/Non-Fall Data/Run/Run (2).csv'
-  analyse(filePath)
-  filePath = './Raw Motion Data/Non-Fall Data/Jump/Jump (2).csv'
-  analyse(filePath)
-  filePath = './Raw Motion Data/Non-Fall Data/Sit/Sit (2).csv'
-  analyse(filePath)
+  
+  
+  filePaths = glob.glob('./Clean Motion Data/*/*/*.csv')
+  labels = []
+  for dir in glob.glob('./Clean Motion Data/*/*'):
+    label = dir.split('/')[-1]
+    labels.append(label)
+  labels = np.array(labels)
+  print(labels)
+
+  allData = np.array([])
+  for filePath in filePaths:
+    data = getCsvData(filePath)
+    label = filePath.split('/')[-1].split(' (')[0]
+    labelID = np.float64(np.where(labels == label)[0])
+
+    feature = motionFeature(data)
+    dataSample = np.r_[labelID , feature]
+    if len(allData) < 1:
+      allData = dataSample
+    else:
+      allData = np.c_[allData, dataSample]
+  
+  headers = np.arange(len(allData)-1)
+  headers = np.r_[['Motion Type'], headers]
+  df = pd.DataFrame(data=allData.T, columns=headers)
+  getMLperformance(df, labels, KNN, 1000)
   #'''
