@@ -96,7 +96,7 @@ def generateDataFrame(filePaths, getFeature, headers=False):
   else: return pd.DataFrame(allData, columns=headers)
 
 
-def motionFeature(data):
+def motionFeature(data, subSample=1):
   dataHigh = butterIIR(data.T, 1, sampleRate/subSample, 2).T
   waistAccNorm = norm(dataHigh[:, 3:6])
   rightAccNorm = norm(dataHigh[:, 13:16])
@@ -104,13 +104,38 @@ def motionFeature(data):
 
   aveAccNorm = np.array([np.average(waistAccNorm), np.average(rightAccNorm), np.average(leftAccNorm)])
   aveAccEnergy = np.array([np.average(waistAccNorm**2), np.average(rightAccNorm**2), np.average(leftAccNorm**2)])
-  energyRatio = aveAccEnergy/aveAccNorm**2
+  #energyRatio = aveAccEnergy/aveAccNorm**2
 
   orientationFeature = poseFeature(data)
+  aveOrientationFeature = np.average(orientationFeature, axis=0)
+  #aveEnergyOrientationFeature = np.average(orientationFeature**2, axis=0)
+  #energyRatioOrientation = aveEnergyOrientationFeature/aveOrientationFeature
+  #gyro = np.r_[ data[0:3,:], data[10:13,:], data[20:23,:] ]
+  waistAcc = data[:, [3, 4, 5]]
+  rightAcc = data[:, [13, 14, 15]]
+  leftAcc = data[:, [23, 24, 25]]
 
+  #dataLength = len(data)
   feature = np.r_[
     orientationFeature[0,:],
     orientationFeature[-1,:],
-    np.r_[aveAccNorm, aveAccEnergy, energyRatio]
+    aveOrientationFeature,
+    #np.max(orientationFeature, axis=0),
+    np.min(orientationFeature, axis=0),
+    #np.var(orientationFeature, axis=0),
+    aveAccNorm, 
+    aveAccEnergy,
+    #norm(waistAcc[0, :]),
+    #norm(rightAcc[0, :]),
+    #norm(leftAcc[0, :]),
+    #norm(waistAcc[-1, :]),
+    #norm(rightAcc[-1, :]),
+    #norm(leftAcc[-1, :]),
+    #np.max(norm(waistAcc[-1, :])),
+    #np.max(norm(rightAcc[-1, :])),
+    #np.max(norm(leftAcc[-1, :])),
+    #data[0, [3, 4, 5, 13, 14, 15, 23, 24, 25]],
+    #data[-1, [3, 4, 5, 13, 14, 15, 23, 24, 25]],
+    #np.average(data[:, [3,4,5, 13,14,15, 23,24,25]]),
   ]
   return feature

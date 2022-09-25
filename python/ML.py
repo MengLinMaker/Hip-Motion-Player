@@ -36,7 +36,7 @@ def getMLperformance(df, header, classifier, numTests=1000):
   plt.figtext(0.45, 0.03, accuracyText, ha="center", fontsize=12, bbox={"facecolor":"orange", "alpha":0.5, "pad":5})
 
   df_cm = pd.DataFrame(confusionMatrix, header, header)
-  sns.heatmap(df_cm, annot=True, fmt=".2%")
+  sns.heatmap(df_cm, annot=True, fmt=".2%", cmap=sns.color_palette("icefire",as_cmap=True))
 
   plt.show()
 
@@ -73,7 +73,7 @@ def Naive_Bayesian(df):
 
 def SVM(df):
   X_train, X_test, y_train, y_test = prepareDataset(df)
-  classifier = svm.SVC(kernel='rbf')
+  classifier = svm.SVC(kernel='linear')
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
   return confusion_matrix(y_test, y_predict)

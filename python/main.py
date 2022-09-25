@@ -5,10 +5,15 @@ import seaborn as sns
 import glob
 from ML import Random_Forest, getMLperformance, KNN, Naive_Bayesian, SVM, Decision_Tree, Logistic_Regression
 
-from utility import VIF, generateDataFrame, motionFeature, poseFeature
+from utility import VIF, butterIIR, generateDataFrame, motionFeature, norm, poseFeature
 from CSV import getCsvData, parsePoseFile
 from plots import plotTimeGraphs, generateWindowedSamples
 from globalVariables import sampleRate
+
+import tsfel
+#from tsfresh.feature_extraction import ComprehensiveFCParameters, extract_features
+#from tsfresh import select_features
+#from tsfresh.utilities.dataframe_functions import impute
 
 
 if __name__ == "__main__":
@@ -64,23 +69,43 @@ if __name__ == "__main__":
     label = dir.split('/')[-1]
     labels.append(label)
   labels = np.array(labels)
-  print(labels)
+  #labels = labels[3::]
+  #labels[0] = labels[0].split(' ')[0]
+  #labels = [labels[0].split(' ')[0], 'Non-Fall']
 
   allData = np.array([])
+  subSample = 5
   for filePath in filePaths:
     data = getCsvData(filePath)
+    data = data[np.arange(0, len(data), subSample), :]
     label = filePath.split('/')[-1].split(' (')[0]
+    #labelID = 1
+    #if label == labels[0]: labelID = 0
     labelID = np.float64(np.where(labels == label)[0])
 
-    feature = motionFeature(data)
-    dataSample = np.r_[labelID , feature]
+    orientationFeature = poseFeature(data)
+    dataHigh = butterIIR(data.T, 1, sampleRate/subSample, 2).T
+    waistAccNorm = norm(dataHigh[:, 3:6])
+    rightAccNorm = norm(dataHigh[:, 13:16])
+    leftAccNorm = norm(dataHigh[:, 23:26])
+
+
+    #df_file = pd.read_csv(filePath)
+    #df_file = pd.DataFrame(data=np.c_[orientationFeature, waistAccNorm, leftAccNorm, rightAccNorm])
+    #cfg = tsfel.get_features_by_domain("temporal")
+    #X = tsfel.time_series_features_extractor(cfg, df_file)
+
+    feature = motionFeature(data, subSample)
+    dataSample = np.r_[labelID, feature]#, X.to_numpy()[0]]
     if len(allData) < 1:
       allData = dataSample
     else:
       allData = np.c_[allData, dataSample]
-  
-  headers = np.arange(len(allData)-1)
-  headers = np.r_[['Motion Type'], headers]
-  df = pd.DataFrame(data=allData.T, columns=headers)
-  getMLperformance(df, labels, KNN, 1000)
+
+  df = pd.DataFrame(data=allData.T)
+  df = df.rename(columns = {0: 'Motion Type'})
+
+  #sns.heatmap(df.corr(), vmin=-1, vmax=1)
+  #print(VIF(df))
+  getMLperformance(df, labels, Naive_Bayesian, 1000)
   #'''
