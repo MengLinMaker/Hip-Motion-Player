@@ -1,7 +1,10 @@
+from matplotlib.colors import ListedColormap
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import spectrogram, cwt, ricker, morlet2, convolve, gausspulse
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 from CSV import getCsvData, saveCsvData
 from utility import butterFilter, norm, quat2cosHeight, butterIIR, peakFilter
@@ -173,3 +176,40 @@ def generateWindowedSamples():
       endID = int(np.floor(sampleRate*float(endTime)))
       saveCsvData(filePath, data[startID:endID, :])
       plotTimeGraphs(filePath)
+
+
+def plotPCA(df, labels):
+  scaler = StandardScaler()
+  scaler.fit(df.values[:, 1::])
+  X_scaled = scaler.transform(df.values[:, 1::])
+
+  pca = PCA()
+  X_pca = pca.fit_transform(X_scaled)
+  plt.plot(100*np.cumsum(np.r_[0, pca.explained_variance_ratio_]), 'o')
+  plt.title('Principle Component Analysis of motion features')
+  plt.xlabel('Number of components')
+  plt.ylabel('Explained variance')
+  plt.axis([0, 10, 0, 100])
+  plt.grid()
+
+  plt.figure(figsize=(10, 7))
+  labelArray = labels[np.int64(df.values[:, 0])]
+  sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], s=30,
+                  hue=labelArray, palette='tab10')
+  plt.title('Motion feature 2D PCA projection')
+  plt.xlabel('Principle component 1')
+  plt.ylabel('Principle component 2')
+
+  plt.figure(figsize=(10, 7))
+  ax = plt.axes(projection='3d')
+  cmap = ListedColormap(sns.color_palette('tab10').as_hex())
+  for g in np.unique(labelArray):
+    IDs = np.where(labelArray == g)
+    ax.scatter3D(X_pca[IDs, 0], X_pca[IDs, 1], X_pca[IDs, 2],
+                 s=30, cmap=cmap)
+  ax.set_title('Motion feature 3D PCA projection')
+  ax.set_xlabel('Principle component 1')
+  ax.set_ylabel('Principle component 2')
+  ax.set_zlabel('Principle component 3')
+  ax.legend(labels)
+  plt.show()

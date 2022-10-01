@@ -96,6 +96,23 @@ def generateDataFrame(filePaths, getFeature, headers=False):
   else: return pd.DataFrame(allData, columns=headers)
 
 
+def mirrorData(data):
+  # Mirror about y axis
+  data[:, 1] = -data[:, 1]
+  data[:, 4] = -data[:, 4]
+  data[:, 7] = -data[:, 7]
+  data[:, 9] = -data[:, 9]
+  data[:, 11] = -data[:, 11]
+  data[:, 14] = -data[:, 14]
+  data[:, 17] = -data[:, 17]
+  data[:, 19] = -data[:, 19]
+  data[:, 21] = -data[:, 21]
+  data[:, 24] = -data[:, 24]
+  data[:, 27] = -data[:, 27]
+  data[:, 29] = -data[:, 29]
+  return data
+
+
 def motionFeature(data, subSample=1):
   dataHigh = butterIIR(data.T, 1, sampleRate/subSample, 2).T
   waistAccNorm = norm(dataHigh[:, 3:6])

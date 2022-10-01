@@ -1,13 +1,19 @@
+from statistics import stdev
+from typing_extensions import runtime
+from matplotlib.colors import LogNorm
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from time import time
+
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
@@ -18,10 +24,17 @@ def getMLperformance(df, header, classifier, numTests=1000):
   numClass = len(df[df.columns[0]].unique())
   confusionMatrix = np.zeros((numClass, numClass))
 
+  runTime = time()
+  accuracyVec = []
   for i in range(0, numTests):
     testConfusion = classifier(df)
     if len(testConfusion) == len(confusionMatrix):
       confusionMatrix = confusionMatrix + testConfusion
+      testConfusion = testConfusion / np.sum(testConfusion)
+      accuracy = 100 * np.trace(testConfusion)
+      accuracyVec.append(accuracy)
+
+  runTime  = 1000 * (time() - runTime) / numTests
 
   confusionMatrix = confusionMatrix / np.sum(confusionMatrix)
   accuracy = 100 * np.trace(confusionMatrix)
@@ -31,13 +44,12 @@ def getMLperformance(df, header, classifier, numTests=1000):
   plt.figure(figsize=(12, 6))
   plt.title(classifier.__name__ + ' average confusion matrix for "' + df.columns[0] + '" detection')
   
-  accuracyText = ' accuracy: {accuracy: .2f}%, Precision: {precision: .2f}%, Recall: {recall: .2f}%'.format(
-    accuracy=accuracy, precision=np.average(precision), recall=np.average(recall))
+  accuracyText = ' accuracy: {accuracy: .2f}±{stdev:.2f}%, Precision: {precision: .2f}%, Recall: {recall: .2f}%, Training time: {time: .3f} ms'.format(
+    accuracy=accuracy, stdev=np.std(accuracyVec), precision=np.average(precision), recall=np.average(recall), time=runTime)
   plt.figtext(0.45, 0.03, accuracyText, ha="center", fontsize=12, bbox={"facecolor":"orange", "alpha":0.5, "pad":5})
 
   df_cm = pd.DataFrame(confusionMatrix, header, header)
-  sns.heatmap(df_cm, annot=True, fmt=".2%", cmap=sns.color_palette("icefire",as_cmap=True))
-
+  sns.heatmap(df_cm, annot=True, fmt=".3%", cmap=sns.color_palette("Spectral",as_cmap=True), norm=LogNorm(), linewidths=1, linecolor='grey')
   plt.show()
 
 
@@ -45,6 +57,9 @@ def prepareDataset(df, test_size=0.20):
   # Assign values to the X and y variables:
   X = df.iloc[:, 1::].values
   y = df.iloc[:, 0].values
+  scaler = StandardScaler()
+  X = scaler.fit_transform(X)
+
 
   # Split dataframe into random train and test subsets:
   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
