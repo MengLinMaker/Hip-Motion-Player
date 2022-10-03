@@ -1,5 +1,4 @@
 from statistics import stdev
-from typing_extensions import runtime
 from matplotlib.colors import LogNorm
 import numpy as np
 import pandas as pd
@@ -20,7 +19,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import svm
 
 
-def getMLperformance(df, header, classifier, numTests=1000):
+def getMLperformance(df, labels, classifier, numTests=1000):
   numClass = len(df[df.columns[0]].unique())
   confusionMatrix = np.zeros((numClass, numClass))
 
@@ -48,7 +47,7 @@ def getMLperformance(df, header, classifier, numTests=1000):
     accuracy=accuracy, stdev=np.std(accuracyVec), precision=np.average(precision), recall=np.average(recall), time=runTime)
   plt.figtext(0.45, 0.03, accuracyText, ha="center", fontsize=12, bbox={"facecolor":"orange", "alpha":0.5, "pad":5})
 
-  df_cm = pd.DataFrame(confusionMatrix, header, header)
+  df_cm = pd.DataFrame(confusionMatrix, labels, labels)
   sns.heatmap(df_cm, annot=True, fmt=".3%", cmap=sns.color_palette("Spectral",as_cmap=True), norm=LogNorm(), linewidths=1, linecolor='grey')
   plt.show()
 
@@ -120,7 +119,7 @@ def LDA(df):
 
 def Logistic_Regression(df):
   X_train, X_test, y_train, y_test = prepareDataset(df)
-  classifier = LogisticRegression()
+  classifier = LogisticRegression(max_iter=150)
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
   return confusion_matrix(y_test, y_predict)

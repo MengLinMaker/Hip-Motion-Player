@@ -4,7 +4,7 @@ from scipy.spatial.transform import Rotation as R
 from scipy.signal import butter, lfilter, iirpeak, iirfilter
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from globalVariables import sampleRate, samplePeriod, subSample
-
+from scipy.stats import kurtosis
 
 from CSV import getCsvData
 
@@ -144,5 +144,8 @@ def motionFeature(data, subSample=1):
     np.average(gyro, axis=0),
     np.sum(aveAccEnergy),
     np.average(gyroNorm, axis=0),
+    #kurtosis(waistAccNorm),
+    #kurtosis(rightAccNorm),
+    #kurtosis(leftAccNorm),
   ]
   return feature

@@ -2,8 +2,10 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 from scipy.signal import spectrogram, cwt, ricker, morlet2, convolve, gausspulse
 from sklearn.decomposition import PCA
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
 
 from CSV import getCsvData, saveCsvData
@@ -179,12 +181,15 @@ def generateWindowedSamples():
 
 
 def plotPCA(df, labels):
+  labelArray = labels[np.int64(df.values[:, 0])]
   scaler = StandardScaler()
   scaler.fit(df.values[:, 1::])
   X_scaled = scaler.transform(df.values[:, 1::])
 
-  pca = PCA()
+  pca = PCA(n_components=9)
   X_pca = pca.fit_transform(X_scaled)
+
+  plt.figure(figsize=(10, 7))
   plt.plot(100*np.cumsum(np.r_[0, pca.explained_variance_ratio_]), 'o')
   plt.title('Principle Component Analysis of motion features')
   plt.xlabel('Number of components')
@@ -192,13 +197,14 @@ def plotPCA(df, labels):
   plt.axis([0, 10, 0, 100])
   plt.grid()
 
-  plt.figure(figsize=(10, 7))
-  labelArray = labels[np.int64(df.values[:, 0])]
-  sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], s=30,
-                  hue=labelArray, palette='tab10')
+  X_df = pd.DataFrame(np.c_[df.values[:, 0], X_pca]).rename(columns={0: 'Labels'})
+  sns.pairplot(X_df, hue='Labels', plot_kws={"s": 10}, palette='tab10')
+
+  #plt.figure(figsize=(10, 7))
+  #sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], s=30, hue=labelArray, palette='tab10')
   plt.title('Motion feature 2D PCA projection')
-  plt.xlabel('Principle component 1')
-  plt.ylabel('Principle component 2')
+  #plt.xlabel('Principle component 1')
+  #plt.ylabel('Principle component 2')
 
   plt.figure(figsize=(10, 7))
   ax = plt.axes(projection='3d')
@@ -208,8 +214,46 @@ def plotPCA(df, labels):
     ax.scatter3D(X_pca[IDs, 0], X_pca[IDs, 1], X_pca[IDs, 2],
                  s=30, cmap=cmap)
   ax.set_title('Motion feature 3D PCA projection')
-  ax.set_xlabel('Principle component 1')
-  ax.set_ylabel('Principle component 2')
-  ax.set_zlabel('Principle component 3')
+  ax.set_xlabel('Component 1')
+  ax.set_ylabel('Component 2')
+  ax.set_zlabel('Component 3')
   ax.legend(labels)
   plt.show()
+
+
+def plotLDA(df, labels):
+  labelArray = labels[np.int64(df.values[:, 0])]
+  scaler = StandardScaler()
+  scaler.fit(df.values[:, 1::])
+  X_scaled = scaler.transform(df.values[:, 1::])
+  lda = LinearDiscriminantAnalysis()
+  X_lda = lda.fit(X_scaled, df.values[:,0]).transform(X_scaled)
+  X_lda = X_lda[:, [1, 2, 3, 4, 5, 6]]
+  
+  plt.figure(figsize=(10, 7))
+  plt.plot(100*np.cumsum(np.r_[0, lda.explained_variance_ratio_]), 'o')
+  plt.title('Cumulative explained variance of motion features')
+  plt.xlabel('Number of largest components')
+  plt.ylabel('Cumulative explained variance')
+  plt.axis([0, 10, 0, 100])
+  plt.grid()
+
+  X_df = pd.DataFrame(np.c_[df.values[:, 0], X_lda]).rename(columns={0: 'Labels'})
+  lm = sns.pairplot(X_df, hue='Labels', plot_kws={"s": 10}, palette='tab10')
+  lm.fig.suptitle('Motion feature 2D LDA projection')
+  lm.fig.subplots_adjust(hspace=0.4, bottom=0.08, top=0.92)
+
+  '''
+  plt.figure(figsize=(10, 7))
+  ax = plt.axes(projection='3d')
+  cmap = ListedColormap(sns.color_palette('tab10').as_hex())
+  for g in np.unique(labelArray):
+    IDs = np.where(labelArray == g)
+    ax.scatter3D(X_lda[IDs, 0], X_lda[IDs, 1], X_lda[IDs, 2], s=30, cmap=cmap)
+  ax.set_title('Motion feature 3D LDA projection')
+  ax.set_xlabel('Component 1')
+  ax.set_ylabel('Component 2')
+  ax.set_zlabel('Component 3')
+  ax.legend(labels)
+  plt.show()
+  #'''
