@@ -1,6 +1,7 @@
 from matplotlib.colors import ListedColormap
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import pandas as pd
 from scipy.signal import spectrogram, cwt, ricker, morlet2, convolve, gausspulse
@@ -198,17 +199,17 @@ def plotPCA(df, labels):
   plt.grid()
 
   X_df = pd.DataFrame(np.c_[df.values[:, 0], X_pca]).rename(columns={0: 'Labels'})
-  sns.pairplot(X_df, hue='Labels', plot_kws={"s": 10}, palette='tab10')
+  sns.pairplot(X_df, hue='Labels', plot_kws={"s": 10}, palette='tab20')
 
   #plt.figure(figsize=(10, 7))
-  #sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], s=30, hue=labelArray, palette='tab10')
+  #sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], s=30, hue=labelArray, palette='tab20')
   plt.title('Motion feature 2D PCA projection')
   #plt.xlabel('Principle component 1')
   #plt.ylabel('Principle component 2')
 
   plt.figure(figsize=(10, 7))
   ax = plt.axes(projection='3d')
-  cmap = ListedColormap(sns.color_palette('tab10').as_hex())
+  cmap = ListedColormap(sns.color_palette('tab20').as_hex())
   for g in np.unique(labelArray):
     IDs = np.where(labelArray == g)
     ax.scatter3D(X_pca[IDs, 0], X_pca[IDs, 1], X_pca[IDs, 2],
@@ -239,14 +240,14 @@ def plotLDA(df, labels):
   plt.grid()
 
   X_df = pd.DataFrame(np.c_[df.values[:, 0], X_lda]).rename(columns={0: 'Labels'})
-  lm = sns.pairplot(X_df, hue='Labels', plot_kws={"s": 10}, palette='tab10')
+  lm = sns.pairplot(X_df, hue='Labels', plot_kws={"s": 10}, palette='tab20')
   lm.fig.suptitle('Motion feature 2D LDA projection')
   lm.fig.subplots_adjust(hspace=0.4, bottom=0.08, top=0.92)
 
-  '''
+  #'''
   plt.figure(figsize=(10, 7))
   ax = plt.axes(projection='3d')
-  cmap = ListedColormap(sns.color_palette('tab10').as_hex())
+  cmap = ListedColormap(sns.color_palette('tab20').as_hex())
   for g in np.unique(labelArray):
     IDs = np.where(labelArray == g)
     ax.scatter3D(X_lda[IDs, 0], X_lda[IDs, 1], X_lda[IDs, 2], s=30, cmap=cmap)

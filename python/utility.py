@@ -98,6 +98,7 @@ def generateDataFrame(filePaths, getFeature, headers=False):
 
 def mirrorData(data):
   # Mirror about y axis
+  #'''
   data[:, 1] = -data[:, 1]
   data[:, 4] = -data[:, 4]
   data[:, 7] = -data[:, 7]
@@ -110,6 +111,12 @@ def mirrorData(data):
   data[:, 24] = -data[:, 24]
   data[:, 27] = -data[:, 27]
   data[:, 29] = -data[:, 29]
+  
+  # Swap left and right leg
+  #temp = data[:, 10:20]
+  #data[:,10:20] = data[:,20:30]
+  #data[:,20:30] = temp
+  #'''
   return data
 
 
@@ -139,11 +146,12 @@ def motionFeature(data, subSample=1):
     orientationFeature[0,:],
     orientationFeature[-1,:],
     aveOrientationFeature,
+    #np.max(orientationFeature, axis=0),
     np.min(orientationFeature, axis=0),
     aveAccNorm,
-    np.average(gyro, axis=0),
-    np.sum(aveAccEnergy),
-    np.average(gyroNorm, axis=0),
+    #np.average(gyro, axis=0),
+    #np.sum(aveAccEnergy),
+    #np.average(gyroNorm, axis=0),
     #kurtosis(waistAccNorm),
     #kurtosis(rightAccNorm),
     #kurtosis(leftAccNorm),

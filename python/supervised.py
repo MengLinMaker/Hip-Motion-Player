@@ -5,8 +5,8 @@ import seaborn as sns
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
-from sklearn.naive_bayes import GaussianNB
 from sklearn.semi_supervised import LabelSpreading
+from sklearn_porter import Porter
 
 from CSV import getCsvData
 from ML import Random_Forest, getMLperformance, KNN, Naive_Bayesian, SVM, Decision_Tree, Logistic_Regression, prepareDataset
@@ -83,11 +83,24 @@ def supervisedMotionDetection():
 
   df_labelled = cleanMotionTrainer(filePaths, labels, subSample=5)
 
-  #plotPCA(df, labels)
-  #plotLDA(df, labels)
+  #plotPCA(df_labelled, labels)
+  #plotLDA(df_labelled, labels)
   
-  getMLperformance(df_labelled, labels, Logistic_Regression, 1000)
+  getMLperformance(df_labelled, labels, Logistic_Regression, 100)
 
+
+def generateClassifierCode(clf, df, lang='js', dst='./'):
+  X_train, X_test, y_train, y_test = prepareDataset(df, test_size=0.001)
+  clf.fit(X_train, y_train)
+
+  porter = Porter(clf, language=lang)
+  classifierCode = porter.export(embed_data=False)
+
+  if lang == 'js':
+    classifierCode = 'export ' + classifierCode
+
+  classifierFile = open(dst + clf.__class__.__name__ + '.' + lang, 'w')
+  classifierFile.write(classifierCode)
 
 
 
@@ -95,8 +108,9 @@ def supervisedMotionDetection():
 
 
 if __name__ == "__main__":
-  #supervisedMotionDetection()
+  supervisedMotionDetection()
 
+  '''
   filePaths = glob('./Clean Motion Data/*/*/*.csv')
   labels = []
   for dir in glob('./Clean Motion Data/*/*'):
@@ -108,31 +122,41 @@ if __name__ == "__main__":
   #labels = ['Fall', 'Non-Fall']
 
   df_labelled = cleanMotionTrainer(filePaths, labels, subSample=5)
+  
+  dummy, clf = SVM(df_labelled)
+  dst = './src/visualiser/machineLearning/'
+  generateClassifierCode(clf, df_labelled, lang='js', dst=dst)
+  '''
+
+  '''
   filePaths = glob('./Raw Motion Data/*/*/*.csv')
   df_unlabelled = unlabelledMotionTrainer(filePaths, subSample=5)
   print(df_unlabelled)
 
-  X_train, X_test, y_train, y_test = prepareDataset(df_labelled, test_size=0.5)
+  X_train, X_test, y_train, y_test = prepareDataset(df_labelled, test_size=0.50)
   df_labelled = pd.DataFrame(data=np.c_[y_train, X_train])
   df_labelled = df_labelled.rename(columns={0: 'Motion Type'})
   df_unlabelled = pd.concat([df_labelled, df_unlabelled], ignore_index=True)
   print(df_unlabelled)
 
-  X_train, dummy1, y_train, dummy2 = prepareDataset(df_unlabelled, test_size=0.1)
-  df_unlabelled = pd.DataFrame(data=np.c_[y_train, X_train])
+  X_train, dummy1, y_train, dummy2 = prepareDataset(df_unlabelled, test_size=0.001)
+  df_unlabelled = pd.DataFrame(data=np.c_[y_train, X_train]).sample(frac=1)
   df_unlabelled = df_unlabelled.rename(columns={0: 'Motion Type'})
   print(df_unlabelled)
 
-  label_spread = LabelSpreading(kernel="rbf", alpha=0.8, max_iter=50)
+  label_spread = LabelSpreading(kernel='knn', alpha=0.02, max_iter=50, gamma=0.25)
   label_spread.fit(df_unlabelled.iloc[:, 1::].values, df_unlabelled.iloc[:, 0].values)
   df_unlabelled.values[:, 0] = label_spread.transduction_
-  X_train, dummy1, y_train, dummy2 = prepareDataset(df_unlabelled, test_size=0.1)
+  X_train, dummy1, y_train, dummy2 = prepareDataset(df_unlabelled, test_size=0.001)
   print(df_unlabelled)
 
 
 
   plotLDA(df_unlabelled, labels)
+  plt.show()
+  #'''
 
+  '''
   classifier = GaussianNB()
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
@@ -156,3 +180,4 @@ if __name__ == "__main__":
   sns.heatmap(df_cm, annot=True, fmt=".3%", cmap=sns.color_palette(
       "Spectral", as_cmap=True), norm=LogNorm(), linewidths=1, linecolor='grey')
   plt.show()
+  #'''

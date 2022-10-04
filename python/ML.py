@@ -9,7 +9,7 @@ from time import time
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import BernoulliNB, CategoricalNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
@@ -26,7 +26,7 @@ def getMLperformance(df, labels, classifier, numTests=1000):
   runTime = time()
   accuracyVec = []
   for i in range(0, numTests):
-    testConfusion = classifier(df)
+    testConfusion, clf = classifier(df)
     if len(testConfusion) == len(confusionMatrix):
       confusionMatrix = confusionMatrix + testConfusion
       testConfusion = testConfusion / np.sum(testConfusion)
@@ -34,7 +34,6 @@ def getMLperformance(df, labels, classifier, numTests=1000):
       accuracyVec.append(accuracy)
 
   runTime  = 1000 * (time() - runTime) / numTests
-
   confusionMatrix = confusionMatrix / np.sum(confusionMatrix)
   accuracy = 100 * np.trace(confusionMatrix)
   precision = 100 * confusionMatrix.diagonal() / np.sum(confusionMatrix, axis=1)
@@ -56,8 +55,8 @@ def prepareDataset(df, test_size=0.20):
   # Assign values to the X and y variables:
   X = df.iloc[:, 1::].values
   y = df.iloc[:, 0].values
-  scaler = StandardScaler()
-  X = scaler.fit_transform(X)
+  #scaler = StandardScaler()
+  #X = scaler.fit_transform(X)
 
 
   # Split dataframe into random train and test subsets:
@@ -74,7 +73,7 @@ def KNN(df, n_neighbors=1):
   classifier = KNeighborsClassifier(n_neighbors=n_neighbors)
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier
 
 
 def Naive_Bayesian(df):
@@ -82,7 +81,7 @@ def Naive_Bayesian(df):
   classifier = GaussianNB()
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier
 
 
 def SVM(df):
@@ -90,7 +89,7 @@ def SVM(df):
   classifier = svm.SVC(kernel='linear')
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier
 
 
 def Random_Forest(df):
@@ -98,7 +97,7 @@ def Random_Forest(df):
   classifier = RandomForestClassifier(n_estimators=10)
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier
 
 
 def Decision_Tree(df):
@@ -106,7 +105,7 @@ def Decision_Tree(df):
   classifier = DecisionTreeClassifier()
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier
 
 
 def LDA(df):
@@ -114,7 +113,7 @@ def LDA(df):
   classifier = LinearDiscriminantAnalysis()
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier
 
 
 def Logistic_Regression(df):
@@ -122,4 +121,4 @@ def Logistic_Regression(df):
   classifier = LogisticRegression(max_iter=150)
   classifier.fit(X_train, y_train)
   y_predict = classifier.predict(X_test)
-  return confusion_matrix(y_test, y_predict)
+  return confusion_matrix(y_test, y_predict), classifier

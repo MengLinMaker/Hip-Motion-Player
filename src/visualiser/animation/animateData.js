@@ -1,17 +1,18 @@
 import * as THREE from 'three'
 
 
-
+let mirror = 1
 // Animate the data
 export default function animateData(hip, rightThigh, leftThigh, currentData, currentPosition){
   let q, qh, qr, ql
+  //mirror = -mirror
 
-  qh = new THREE.Quaternion(currentData[7], currentData[8], currentData[9], currentData[6]).normalize()
+  qh = new THREE.Quaternion(mirror*currentData[7], currentData[8], mirror*currentData[9], currentData[6]).normalize()
   hip.rotation.setFromQuaternion(qh)
-  qh = new THREE.Quaternion(currentData[7], currentData[8], currentData[9], -currentData[6]).normalize()
+  qh = new THREE.Quaternion(mirror*currentData[7], currentData[8], mirror*currentData[9], -currentData[6]).normalize()
 
   hip.position.x = currentPosition[0]
-  hip.position.y = currentPosition[1]
+  hip.position.y = mirror*currentPosition[1]
   hip.position.z = currentPosition[2]
 
   /*/
@@ -22,11 +23,14 @@ export default function animateData(hip, rightThigh, leftThigh, currentData, cur
   rotation = (rotation+360) % 360
   //*/
 
-  q = new THREE.Quaternion(currentData[17], currentData[18], currentData[19], currentData[16]).normalize()
+  q = new THREE.Quaternion(mirror*currentData[17], currentData[18], mirror*currentData[19], currentData[16]).normalize()
   qr = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
-  rightThigh.rotation.setFromQuaternion(qr)
+  if (mirror == 1) rightThigh.rotation.setFromQuaternion(qr)
+  else leftThigh.rotation.setFromQuaternion(qr)
 
-  q = new THREE.Quaternion(currentData[27], currentData[28], currentData[29], currentData[26]).normalize()
+  q = new THREE.Quaternion(mirror*currentData[27], currentData[28], mirror*currentData[29], currentData[26]).normalize()
   ql = new THREE.Quaternion().multiplyQuaternions(qh,q).normalize()
-  leftThigh.rotation.setFromQuaternion(ql)
+  if (mirror == 1) leftThigh.rotation.setFromQuaternion(ql)
+  else rightThigh.rotation.setFromQuaternion(ql)
+
 }
