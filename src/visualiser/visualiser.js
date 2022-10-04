@@ -8,6 +8,7 @@ import { csvToArray, getCachedBlobUrl, getDataPosition } from './dataProcessing'
 import { initialiseScene, resizeCanvas, setupScene } from './scene'
 import { animateData, walkingAnimation } from './animation'
 import SliderPlayer from './sliderPlayer/sliderPlayer'
+import { motionFeature } from './machineLearning/generateFeature'
 
 
 
@@ -28,6 +29,7 @@ let dataPosition = getDataPosition(data)
 
 // Prepare initialised data
 if (data != null) {
+  console.log(motionFeature(data))
   sliderPlayer.setScrubberMax(data.length-1)
   sliderPlayer.playButtonHandler()
 }

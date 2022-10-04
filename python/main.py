@@ -20,7 +20,7 @@ if __name__ == "__main__":
   #generateWindowedSamples()
 
   '''
-  fileSrcPath = './Clean Motion Data/Non Fall/Walk (%).csv'
+  fileSrcPath = './Clean Motion Data/Non Fall/Walk/Walk (1).csv'
   fileDstPath = './Clean Motion Data/Pose/Stand.csv'
   parsePoseFile(fileSrcPath, fileDstPath, -1)
   #'''
@@ -56,10 +56,12 @@ if __name__ == "__main__":
 
   #'''
   #filePath = './Raw Motion Data/Fall Data/Fall Front/Fall Front (1).csv'
-  #filePath = './Raw Motion Data/Non-Fall Data/Walk/Walk (20).csv'
+  filePath = './Raw Motion Data/Non-Fall Data/Walk/Walk (20).csv'
   #filePath = './Raw Motion Data/Non-Fall Data/Run/Run (20).csv'
   #filePath = './Raw Motion Data/Non-Fall Data/Stair/Stair (20).csv'
   #filePath = './Raw Motion Data/Fall Data/Fall Right/Fall Right (20).csv'
+  plotTimeGraphs(filePath, 5)
+  plt.show()
 
   
 

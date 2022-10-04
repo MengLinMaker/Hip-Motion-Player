@@ -11,7 +11,7 @@ from sklearn_porter import Porter
 from CSV import getCsvData
 from ML import Random_Forest, getMLperformance, KNN, Naive_Bayesian, SVM, Decision_Tree, Logistic_Regression, prepareDataset
 from plots import plotLDA, plotPCA
-from utility import mirrorData, motionFeature
+from utility import mirrorData, motionFeature, quat2cosHeight
 from globalVariables import sampleRate
 
 
@@ -85,7 +85,7 @@ def supervisedMotionDetection():
 
   #plotPCA(df_labelled, labels)
   #plotLDA(df_labelled, labels)
-  
+  #print(quat2cosHeight(np.array( [[1,0,0,10],[0,1,0,10],[0,0,1,10],[1,1,1,10]] )).T)
   getMLperformance(df_labelled, labels, Logistic_Regression, 100)
 
 

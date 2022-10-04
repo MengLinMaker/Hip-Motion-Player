@@ -50,15 +50,18 @@ def VIF(data):
 
 def quat2cosHeight(quat):
   # Calculate waist vector relative to earth
-  rot = R.from_quat(quat)
   if quat.ndim == 2:
+    quat = np.c_[quat[:,1], quat[:,2], quat[:,3], quat[:,0]]
+    rot = R.from_quat(quat)
     cosHeightX = rot.apply([1, 0, 0])[:, 2]
     cosHeightY = rot.apply([0, 1, 0])[:, 2]
-    cosHeightZ = rot.apply([0, 0, -1])[:, 2]
+    cosHeightZ = rot.apply([0, 0, 1])[:, 2]
   elif quat.ndim == 1:
+    quat = [quat[1], quat[2], quat[3], quat[0]]
+    rot = R.from_quat(quat)
     cosHeightX = rot.apply([1, 0, 0])[2]
     cosHeightY = rot.apply([0, 1, 0])[2]
-    cosHeightZ = rot.apply([0, 0, -1])[2]
+    cosHeightZ = rot.apply([0, 0, 1])[2]
   return np.array([cosHeightX, cosHeightY, cosHeightZ])
 
 
@@ -66,15 +69,15 @@ def quat2cosHeight(quat):
 def poseFeature(data):
   if data.ndim == 2:
     feature = np.c_[
-      quat2cosHeight(data[:, [9, 6, 7, 8]]).T,
-      quat2cosHeight(data[:, [19, 16, 17, 18]]).T,
-      quat2cosHeight(data[:, [29, 26, 27, 28]]).T
+      quat2cosHeight(data[:, 6:10]).T,
+      quat2cosHeight(data[:, 16:20]).T,
+      quat2cosHeight(data[:, 26:30]).T
     ]
   else:
     feature = np.r_[
-      quat2cosHeight(data[[9, 6, 7, 8]]).T,
-      quat2cosHeight(data[[19, 16, 17, 18]]).T,
-      quat2cosHeight(data[[29, 26, 27, 28]]).T
+      quat2cosHeight(data[6:10]).T,
+      quat2cosHeight(data[16:20]).T,
+      quat2cosHeight(data[26:30]).T
     ]
   return feature
 

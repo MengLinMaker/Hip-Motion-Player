@@ -10,7 +10,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
 
 from CSV import getCsvData, saveCsvData
-from utility import butterFilter, norm, quat2cosHeight, butterIIR, peakFilter
+from utility import butterFilter, motionFeature, norm, quat2cosHeight, butterIIR, peakFilter
 from globalVariables import sampleRate, samplePeriod
 
 
@@ -23,7 +23,8 @@ def plotTimeGraphs(filePath, subSample=1):
   data = getCsvData(filePath)
   data = data[np.arange(0, len(data), subSample), :]
   timeStamp = np.linspace(0, len(data)*samplePeriod*subSample, len(data))
-
+  print(motionFeature(data))
+  print(motionFeature(data).shape)
   '''
   freqMorlet = 2
   w = 5
@@ -66,13 +67,13 @@ def plotTimeGraphs(filePath, subSample=1):
   #plotGyroNorm(data, timeStamp, ax[0])
   #ax[0].set_title('2nd order 20 Hz high pass Butterworth')
   
-  plotCosHeight(data[:, [9, 6, 7, 8]], timeStamp, ax[0])
+  plotCosHeight(data[:, 6:10], timeStamp, ax[0])
   ax[0].set_title('Waist global cosine height')
 
-  plotCosHeight(data[:, [19, 16, 17, 18]], timeStamp, ax[1])
+  plotCosHeight(data[:, 16:20], timeStamp, ax[1])
   ax[1].set_title('Right global cosine height')
 
-  plotCosHeight(data[:, [29, 26, 27, 28]], timeStamp, ax[2])
+  plotCosHeight(data[:, 26:30], timeStamp, ax[2])
   ax[2].set_title('Left global cosine height')
 
   plotAccNorm(data2, timeStamp, ax[3])

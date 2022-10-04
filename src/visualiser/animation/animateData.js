@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 
 
+
 let mirror = 1
 // Animate the data
 export default function animateData(hip, rightThigh, leftThigh, currentData, currentPosition){
