@@ -1,4 +1,16 @@
 import * as THREE from 'three'
+import Fili from 'fili'
+import { clf } from './SVC'
+
+
+
+function arrayHandler(arr, func) {
+  if (Array.isArray(arr[0])){
+    return arr.map((q) => {return func(q)})
+  } else {
+    return func(arr)
+  }
+}
 
 
 
@@ -11,12 +23,7 @@ export function quat2cosHeight(quat){
     const cosHeightZ = new THREE.Vector3(0, 0, 1).applyQuaternion(q).z
     return [cosHeightX, cosHeightY, cosHeightZ] 
   }
-
-  if (Array.isArray(quat[0])){
-    return quat.map((q) => {return quat2cosHeight2(q)})
-  } else {
-    return quat2cosHeight2(quat)
-  }
+  return arrayHandler(quat, quat2cosHeight2)
 }
 
 
@@ -28,13 +35,9 @@ export function poseFeature(data){
     cosHeightArr = cosHeightArr.concat( quat2cosHeight([d[27], d[28], d[29], d[26]]) )  
     return cosHeightArr
   }
-
-  if (Array.isArray(data[0])){
-    return data.map((d) => {return poseFeature2(d)})
-  } else {
-    return poseFeature2(data)
-  }
+  return arrayHandler(data, poseFeature2)
 }
+
 
 
 function transpose(matrix) {
@@ -49,20 +52,16 @@ function transpose(matrix) {
 }
 
 
+
 function average(data) {
   function average2(d) {
     let sum = 0
     for (let i = 0; i < d.length; i++) { sum += d[i] }
     return sum/d.length
   }
-  
-  if (Array.isArray(data[0])){
-    return data.map((d) => {
-      return average2(d)})
-  } else {
-    return average2(data)
-  }
+  return arrayHandler(data, average2)
 }
+
 
 
 function min(data) {
@@ -73,14 +72,9 @@ function min(data) {
     }
     return least
   }
-
-  if (Array.isArray(data[0])){
-    return data.map((d) => {
-      return min2(d)})
-  } else {
-    return min2(data)
-  }
+  return arrayHandler(data, min2)
 }
+
 
 
 function max(data) {
@@ -91,45 +85,83 @@ function max(data) {
     }
     return most
   }
-
-  if (Array.isArray(data[0])){
-    return data.map((d) => {
-      return max2(d)})
-  } else {
-    return max2(data)
-  }
+  return arrayHandler(data, max2)
 }
 
 
-export function motionFeature(data, subSample=1){
-  //const dataHigh = butterIIR(data.T, 1, sampleRate/subSample, 2).T
-  //waistAccNorm = norm(dataHigh[:, 3:6])
-  //rightAccNorm = norm(dataHigh[:, 13:16])
-  //leftAccNorm = norm(dataHigh[:, 23:26])
-  //aveAccNorm = np.array([np.average(waistAccNorm), np.average(rightAccNorm), np.average(leftAccNorm)])
-  //aveAccEnergy = np.array([np.average(waistAccNorm**2), np.average(rightAccNorm**2), np.average(leftAccNorm**2)])
+
+function norm(data) {
+  function norm2(d) {
+    let val = 0
+    for (let i = 0; i < d.length; i++) {
+      val += d[i]**2
+    }
+    return val**0.5
+  }
+  return arrayHandler(data, norm2)
+}
+
+
+
+const iirCalculator = new Fili.CalcCascades();
+function highPassFilter(data, Fs, Fc) {
+  const iirHighPass = iirCalculator.highpass({ order: 1, characteristic: 'butterworth', Fs: Fs, Fc: Fc })
+  const iirFilter = new Fili.IirFilter(iirHighPass)
+
+  function highPassFilter2(d) {
+    return iirFilter.simulate(d)
+  }
+  return arrayHandler(data, highPassFilter2)
+}
+
+
+
+export function motionFeature(data, sampleRate){
+  const windowSec = 3
+  if (data.length > windowSec*sampleRate) {
+    data = data.slice(0,windowSec*sampleRate)
+  }
 
   const orientationFeature = poseFeature(data)
-  const aveOrientationFeature = average(transpose(orientationFeature))
-  const minOrientationFeature = min(transpose(orientationFeature))
-  //waistGyro = data[0:3, :]
-  //rightGyro = data[10:13, :]
-  //leftGyro = data[20:23, :]
-  //gyro = np.r_[ waistGyro, rightGyro, leftGyro]
+  const orientationFeatureT = transpose(orientationFeature)
+  
+  const waistAccHigh = highPassFilter(transpose(data).slice(3, 6), sampleRate, 1)
+  const rightAccHigh = highPassFilter(transpose(data).slice(13, 16), sampleRate, 1)
+  const leftAccHigh = highPassFilter(transpose(data).slice(23, 26), sampleRate, 1)
+  
+  const waistAccNorm = norm(transpose(waistAccHigh))
+  const rightAccNorm = norm(transpose(rightAccHigh))
+  const leftAccNorm = norm(transpose(leftAccHigh))
 
-  //gyroNorm = np.r_[norm(waistGyro), norm(rightGyro), norm(leftGyro)]
-  //waistAcc = data[:, [3, 4, 5]]
-  //rightAcc = data[:, [13, 14, 15]]
-  //leftAcc = data[:, [23, 24, 25]]
+  const aveAccNorm = [average(waistAccNorm), average(rightAccNorm), average(leftAccNorm)]
 
   let feature = orientationFeature[0]
   feature = feature.concat(orientationFeature[orientationFeature.length-1])
-  feature = feature.concat(aveOrientationFeature)
+  feature = feature.concat(average(orientationFeatureT))
   //feature = feature.concat(np.max(orientationFeature, axis=0))
-  feature = feature.concat(minOrientationFeature)
-  //aveAccNorm,
-  //np.average(gyro, axis=0),
-  //np.sum(aveAccEnergy),
-  //np.average(gyroNorm, axis=0),
+  feature = feature.concat(min(orientationFeatureT))
+  feature = feature.concat(aveAccNorm)
   return feature
+}
+
+
+let oldClassID = -1
+let filterClassID = -1
+let counter = 0
+export function classifyMotion(data, sampleRate) {
+  const feature = motionFeature(data, sampleRate)
+  const classID = clf.predict(feature)
+
+  if (oldClassID == -1) {
+    oldClassID = classID
+    filterClassID = classID
+    counter = 0
+  } else if (classID == oldClassID) {
+    counter += 1
+    if (counter > 50) filterClassID = classID
+  } else counter = 0
+  oldClassID = classID
+
+  const className = ['Fall Back', 'Fall Front', 'Fall Left', 'Fall Right', 'Jump', 'Run', 'Sit', 'Stair', 'Stand', 'Walk']
+  return className[filterClassID]
 }

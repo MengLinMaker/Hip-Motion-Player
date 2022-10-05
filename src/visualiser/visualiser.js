@@ -8,7 +8,7 @@ import { csvToArray, getCachedBlobUrl, getDataPosition } from './dataProcessing'
 import { initialiseScene, resizeCanvas, setupScene } from './scene'
 import { animateData, walkingAnimation } from './animation'
 import SliderPlayer from './sliderPlayer/sliderPlayer'
-import { motionFeature } from './machineLearning/generateFeature'
+import { classifyMotion } from './machineLearning/generateFeature'
 
 
 
@@ -18,8 +18,13 @@ export default async function setupMotionVisualiser(visualiserContainer, data=nu
 visualiserContainer.innerHTML=`
 <div style='position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;'>
   <canvas id="visualiser" style='width: 100%;'></canvas>
+  <div style='position: absolute; z-index:10; background-color: #ffffffdd; backdrop-filter: blur(3px); top: 3rem; padding: 0.5rem 1rem; display:  text-align: center; border-radius: 10rem; box-shadow: 0 1px 3px #00000044;'>
+    <p id='labelML' style='text-align: center; margin: 0; font-family: Verdana; font-weight: bold'>
+  </div>
   <div id='sliderPlayer' style='position: absolute; background-color: #ffffffdd; backdrop-filter: blur(3px); bottom: 3rem; padding: 0.3rem; width: 80%; display: flex; align-items: center; border-radius: 10rem; box-shadow: 0 1px 3px #00000044; max-width: 600px;'></div>
 </div>`
+
+const labelML = document.querySelector('#labelML')
 
 // create a slider player for data control
 const sliderPlayer = new SliderPlayer(document.querySelector('#sliderPlayer'), dataRate)
@@ -29,7 +34,6 @@ let dataPosition = getDataPosition(data)
 
 // Prepare initialised data
 if (data != null) {
-  console.log(motionFeature(data))
   sliderPlayer.setScrubberMax(data.length-1)
   sliderPlayer.playButtonHandler()
 }
@@ -158,6 +162,11 @@ function animate() {
       if (data != null) {
         const scrubberCounter = sliderPlayer.getScrubberCounter()
         animateData(hip, rightThigh, leftThigh, data[scrubberCounter], dataPosition[scrubberCounter])
+        
+        const modScrubber = Math.max(scrubberCounter-3*dataRate,0)
+        const windowData = data.slice(modScrubber,modScrubber+3*dataRate)
+        labelML.innerHTML = classifyMotion(windowData, dataRate)
+
       }
       else walkingAnimation(hip, rightThigh, leftThigh, FPS)
       controls.update()

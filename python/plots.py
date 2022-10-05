@@ -10,7 +10,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.preprocessing import StandardScaler
 
 from CSV import getCsvData, saveCsvData
-from utility import butterFilter, motionFeature, norm, quat2cosHeight, butterIIR, peakFilter
+from utility import butterFilter, norm, quat2cosHeight, butterIIR, peakFilter
 from globalVariables import sampleRate, samplePeriod
 
 
@@ -23,8 +23,7 @@ def plotTimeGraphs(filePath, subSample=1):
   data = getCsvData(filePath)
   data = data[np.arange(0, len(data), subSample), :]
   timeStamp = np.linspace(0, len(data)*samplePeriod*subSample, len(data))
-  print(motionFeature(data))
-  print(motionFeature(data).shape)
+  
   '''
   freqMorlet = 2
   w = 5

@@ -86,7 +86,7 @@ def supervisedMotionDetection():
   #plotPCA(df_labelled, labels)
   #plotLDA(df_labelled, labels)
   #print(quat2cosHeight(np.array( [[1,0,0,10],[0,1,0,10],[0,0,1,10],[1,1,1,10]] )).T)
-  getMLperformance(df_labelled, labels, Logistic_Regression, 100)
+  getMLperformance(df_labelled, labels, Naive_Bayesian, 100)
 
 
 def generateClassifierCode(clf, df, lang='js', dst='./'):
