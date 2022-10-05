@@ -9,8 +9,10 @@
   <img alt="GitHub" src="https://img.shields.io/github/license/menglinmaker/Hip-Motion-Player?style=flat-square">
   <img src="https://img.shields.io/github/languages/code-size/menglinmaker/Hip-Motion-Player?style=flat-square">
   <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https://menglinmaker-hip-motion-player.netlify.app/&style=flat-square">
-  <img src="https://img.shields.io/tokei/lines/github.com/menglinmaker/Hip-Motion-Player?style=flat-square">
+  <img src="https://tokei.ekzhang.com/b1/github/menglinmaker/Hip-Motion-Player">
 </div>
+
+
 
 Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLinMaker/Hip-Motion-Capture). The [captured motion data](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Motion%20Data) is sampled at 50Hz. Each timestamp is represented by a row in the CSV file and displayed in the following format:
 
