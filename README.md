@@ -9,7 +9,6 @@
   <img alt="GitHub" src="https://img.shields.io/github/license/menglinmaker/Hip-Motion-Player?style=flat-square">
   <img src="https://img.shields.io/github/languages/code-size/menglinmaker/Hip-Motion-Player?style=flat-square">
   <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https://menglinmaker-hip-motion-player.netlify.app/&style=flat-square">
-  <img src="https://tokei.ekzhang.com/b1/github/menglinmaker/Hip-Motion-Player">
 </div>
 
 
