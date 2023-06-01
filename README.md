@@ -15,7 +15,7 @@ Data scientists can collect labelled data to train better fall detection algorit
   <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https://menglinmaker-hip-motion-player.netlify.app/&style=flat-square">
 </div>
 
-Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLinMaker/Hip-Motion-Capture). The [captured motion data](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Motion%20Data) is sampled at 50Hz. Each timestamp is represented by a row in the CSV file and displayed in the following format:
+Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLinMaker/Hip-Motion-Capture). The [captured motion data](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Raw%20Motion%20Data) is sampled at 50Hz. Each timestamp is represented by a row in the CSV file and displayed in the following format:
 
 **Waist IMU data - Column A to J**
 * Gyro (rad/s): x, y, z - Column A to C
