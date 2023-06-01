@@ -1,5 +1,9 @@
 <h1 align="center"> Hip Motion Player - <a href="https://menglinmaker-hip-motion-player.netlify.app/">Demo</a></h1>
 
+## Purpose
+Diagnose fall injuries and prevent falls using 3D visualisation.
+Data scientists can collect labelled data to train better fall detection algorithms.
+
 <div align="center">
   <img width="500" src="https://user-images.githubusercontent.com/39476147/189935030-371cc4b4-a2a7-4ff3-9d71-7a1369c090a9.gif"
   href="https://menglinmaker-hip-motion-player.netlify.app/"/>
@@ -10,8 +14,6 @@
   <img src="https://img.shields.io/github/languages/code-size/menglinmaker/Hip-Motion-Player?style=flat-square">
   <img src="https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https://menglinmaker-hip-motion-player.netlify.app/&style=flat-square">
 </div>
-
-
 
 Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLinMaker/Hip-Motion-Capture). The [captured motion data](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Motion%20Data) is sampled at 50Hz. Each timestamp is represented by a row in the CSV file and displayed in the following format:
 
@@ -30,7 +32,7 @@ Playing motion capture data from [Hip-Motion-Capture](https://github.com/MengLin
 
 <div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
 
-# How to use
+## How to use
 1. Download the sample data from ['Raw Motion Data'](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/Raw%20Motion%20Data) folder.
 2. Drag a CSV file onto the 3D model in the [demo website](https://menglinmaker-hip-motion-player.netlify.app/).
 3. Press the pause/play button or drag the input slider.
@@ -39,7 +41,7 @@ Have fun!
 
 <div>&nbsp</div><div>&nbsp</div><div>&nbsp</div>
 
-# Integrating into other projects
+## Integrating into other projects
 1. Install dependencies in project root directory with `npm i localforage three fili`
 2. Download the [src/visualiser](https://github.com/MengLinMaker/Hip-Motion-Player/tree/main/src/visualiser) folder.
 3. In your project, create a div element: `<div id='visualiserID'/>`
